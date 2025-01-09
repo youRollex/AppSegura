@@ -1,0 +1,15 @@
+version: '3'
+
+
+services:
+  auth-db:
+    image: postgres:14.11
+    restart: always
+    ports:
+      - "5401:5432"
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD_AUTH}
+      POSTGRES_DB: ${DB_NAME_AUTH}
+    container_name: deckexcdbauth
+    volumes:
+      - ./postgres_auth:/var/lib/postgresql/data

@@ -1,0 +1,14 @@
+<h1 class="mt-5"><strong>Tarjetas disponibles</strong></h1>
+<mat-divider></mat-divider>
+
+<div class="grid mt-3">
+  <div class="p-2 col-xl-3 col-md-4 col-sm-6 col-xs-12" *ngFor="let card of offers">
+    <app-card [offers]="card" (cardDeleted)="onDeleteCard(card.id)"></app-card>
+  </div>
+</div>
+
+<button mat-fab *ngIf="!isOpen" class="chat-button" (click)="openChat()">
+  <mat-icon>chat</mat-icon>
+</button>
+
+<app-chat *ngIf="isOpen"></app-chat>

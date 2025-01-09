@@ -1,0 +1,19 @@
+<div class="chat-container" *ngIf="isOpen">
+  <div class="chat-header">
+    <h2>Chat</h2>
+    <button mat-icon-button (click)="closeChat()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <div class="chat-messages">
+    <div class="message p-2" *ngFor="let msg of messages">
+      <div class="message-content">
+        <strong>{{ msg.name }}</strong>: {{ msg.message }}
+      </div>
+    </div>
+  </div>
+  <div class="chat-input">
+    <input [(ngModel)]="message" placeholder="Escribe un mensaje" (keyup.enter)="sendMessage()" />
+    <button mat-flat-button (click)="sendMessage()">Enviar</button>
+  </div>
+</div>

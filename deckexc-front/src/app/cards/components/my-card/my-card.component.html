@@ -1,0 +1,23 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title class="p-2"> {{offers.card.name}} </mat-card-title>
+  </mat-card-header>
+  <img mat-card-image [src]="imagenRuta" [alt]="offers.card.name" class="p-2">
+
+  <mat-card-content class="mt-2">
+    <h3><strong>Descripci&oacute;n:</strong> {{offers.description}} </h3>
+    <h3><strong>Estado:</strong> {{offers.condition}}</h3>
+    <h3><strong>Precio: </strong>${{offers.price}}</h3>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-actions>
+    <span class="spacer"></span>
+
+    <button mat-button mat-raised color="primary" [routerLink]="['/cards/edit/', offers.id]">
+      <mat-icon matListItemIcon>edit</mat-icon>
+      Editar
+    </button>
+  </mat-card-actions>
+</mat-card>

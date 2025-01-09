@@ -1,0 +1,39 @@
+{
+  "cards": [
+    {
+      "nombre": "Pokémon Charizard",
+      "imagen": "https://th.bing.com/th/id/R.c137ec0d43a67828128221911a58a9f8?rik=uK1UjXvFuhtZsA&riu=http%3a%2f%2fwww.pokemasters.net%2fpokedex%2fimages%2fpokemon%2f6000.png&ehk=K6YpM24hy0tce1BU%2b3h8nqr6UTdzt409zWOZgRdp5qc%3d&risl=&pid=ImgRaw&r=0",
+      "descripcion": "Charizard es un Pokémon de tipo fuego/volador introducido en la primera generación. Es uno de los Pokémon más populares y reconocidos de la franquicia.",
+      "estado": "Excelente",
+      "precio": 100.00
+    },
+    {
+      "nombre": "Yu-Gi-Oh! Dark Magician",
+      "imagen": "https://th.bing.com/th/id/R.c137ec0d43a67828128221911a58a9f8?rik=uK1UjXvFuhtZsA&riu=http%3a%2f%2fwww.pokemasters.net%2fpokedex%2fimages%2fpokemon%2f6000.png&ehk=K6YpM24hy0tce1BU%2b3h8nqr6UTdzt409zWOZgRdp5qc%3d&risl=&pid=ImgRaw&r=0",
+      "descripcion": "Dark Magician es un monstruo de tipo Hechicero introducido en la primera edición del Juego de Cartas Coleccionables Yu-Gi-Oh!. Es uno de los monstruos más poderosos y emblemáticos del juego.",
+      "estado": "Usado",
+      "precio": 50.00
+    },
+    {
+      "nombre": "Magic: The Gathering Black Lotus",
+      "imagen": "https://th.bing.com/th/id/R.c137ec0d43a67828128221911a58a9f8?rik=uK1UjXvFuhtZsA&riu=http%3a%2f%2fwww.pokemasters.net%2fpokedex%2fimages%2fpokemon%2f6000.png&ehk=K6YpM24hy0tce1BU%2b3h8nqr6UTdzt409zWOZgRdp5qc%3d&risl=&pid=ImgRaw&r=0",
+      "descripcion": "Black Lotus es una carta de artefacto legendaria introducida en la primera edición de Magic: The Gathering. Es una de las cartas más raras y poderosas del juego.",
+      "estado": "Nuevo",
+      "precio": 1000.00
+    },
+    {
+      "nombre": "Dragon Ball Super Card Game Son Goku",
+      "imagen": "https://th.bing.com/th/id/R.c137ec0d43a67828128221911a58a9f8?rik=uK1UjXvFuhtZsA&riu=http%3a%2f%2fwww.pokemasters.net%2fpokedex%2fimages%2fpokemon%2f6000.png&ehk=K6YpM24hy0tce1BU%2b3h8nqr6UTdzt409zWOZgRdp5qc%3d&risl=&pid=ImgRaw&r=0",
+      "descripcion": "Son Goku es el protagonista de la serie Dragon Ball y uno de los personajes más populares de la cultura pop. Su carta coleccionable es muy codiciada por los fanáticos.",
+      "estado": "Mint",
+      "precio": 20.00
+    },
+    {
+      "nombre": "Naruto Shippuden Ultimate Ninja Storm Boruto",
+      "imagen": "https://th.bing.com/th/id/R.c137ec0d43a67828128221911a58a9f8?rik=uK1UjXvFuhtZsA&riu=http%3a%2f%2fwww.pokemasters.net%2fpokedex%2fimages%2fpokemon%2f6000.png&ehk=K6YpM24hy0tce1BU%2b3h8nqr6UTdzt409zWOZgRdp5qc%3d&risl=&pid=ImgRaw&r=0",
+      "descripcion": "Boruto Uzumaki es el hijo de Naruto Uzumaki, el protagonista de la serie Naruto. Su carta coleccionable es una pieza popular entre los fanáticos de la serie.",
+      "estado": "Near Mint",
+      "precio": 15.00
+    }
+  ]
+}

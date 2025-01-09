@@ -1,0 +1,63 @@
+<h1 class="mt-5">
+  <strong>
+    Agregar
+  </strong>
+</h1>
+
+<mat-divider class="mb-2"></mat-divider>
+
+<div class="grid">
+  <div class="mt-3 col-12 col-sm-6">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title class="p-2">
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <form class="grid" [formGroup]="cardForm" (ngSubmit)="onSubmit()">
+          <mat-form-field class="col-12 col-sm-6">
+            <mat-label>Tarjeta</mat-label>
+            <mat-select required formControlName="cardId">
+              <mat-option *ngFor="let card of cards" [value]="card.id">
+                {{ card.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="col-12 col-sm-6">
+            <mat-label>Descripci&oacute;n</mat-label>
+            <input matInput type="text" required formControlName="description">
+          </mat-form-field>
+
+          <mat-form-field class="col-12 col-sm-6">
+            <mat-label>Condici&oacute;n</mat-label>
+            <mat-select required formControlName="condition">
+              <mat-option value="Excelente">Excelente</mat-option>
+              <mat-option value="Usado">Usado</mat-option>
+              <mat-option value="Nuevo">Nuevo</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="col-12 col-sm-6">
+            <mat-label>Precio</mat-label>
+            <input matInput type="number" required formControlName="price">
+          </mat-form-field>
+
+        </form>
+
+        <mat-card-actions>
+            <span class="spacer"></span>
+
+            <button mat-raised-button color="primary" (click)="onSubmit()">
+              <mat-icon>save</mat-icon>
+              Guardar
+            </button>
+          </mat-card-actions>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>

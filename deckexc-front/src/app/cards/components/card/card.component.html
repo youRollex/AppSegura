@@ -1,0 +1,26 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title class="p-2"> {{offers.card.name}} </mat-card-title>
+  </mat-card-header>
+  <div class="text-center">
+    <img mat-card-image [src]="imagenRuta" [alt]="offers.card.name" class="p-2">
+  </div>
+
+  <mat-card-content class="mt-2">
+    <h3><strong>Descripci&oacute;n:</strong> {{offers.description}} </h3>
+    <h3><strong>Estado:</strong> {{offers.condition}}</h3>
+    <h3><strong>Precio: </strong>${{offers.price}}</h3>
+    <h3><strong>Usuario que vende: </strong>{{offers.user.name}}</h3>
+  </mat-card-content>
+
+
+  <!-- <mat-card-actions>
+    <button mat-button mat-raised color="primary" (click)="buyCard(offers.id)">
+      <mat-icon matListItemIcon>shopping_cart</mat-icon>
+      Comprar
+    </button>
+
+    <span class="spacer"></span>
+
+  </mat-card-actions> -->
+</mat-card>

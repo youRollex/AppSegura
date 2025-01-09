@@ -1,0 +1,15 @@
+version: '3'
+
+
+services:
+  offers-db:
+    image: postgres:14.11
+    restart: always
+    ports:
+      - "5404:5432"
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD_OFFERS}
+      POSTGRES_DB: ${DB_NAME_OFFERS}
+    container_name: deckexcdboffers
+    volumes:
+      - ./postgres_offers:/var/lib/postgresql/data

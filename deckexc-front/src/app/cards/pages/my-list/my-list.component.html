@@ -1,0 +1,8 @@
+<h1 class="mt-5"><strong>Mis Tarjetas</strong></h1>
+<mat-divider></mat-divider>
+
+<div class="grid mt-3">
+  <div class="p-2 col-xl-3 col-md-4 col-sm-6 col-xs-12" *ngFor="let card of myOffers">
+    <app-my-card [offers]="card"></app-my-card>
+  </div>
+</div>

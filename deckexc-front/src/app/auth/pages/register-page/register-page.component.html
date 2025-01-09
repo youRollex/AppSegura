@@ -1,0 +1,57 @@
+  <h1 class=" mt-5">Registrar</h1>
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" >
+
+    <mat-form-field class="mt-5">
+      <mat-label>Nombre</mat-label>
+      <input type="text" matInput formControlName="name" placeholder="Ingrese su nombre">
+      <mat-hint *ngIf="isValidField('name')" class="text-danger">Ingrese su nombre</mat-hint>
+    </mat-form-field>
+    <br>
+
+    <mat-form-field>
+      <mat-label>Correo electr&oacute;nico</mat-label>
+      <input type="email" matInput formControlName="email" placeholder="Ingrese su correo electr&oacute;nico">
+      <mat-hint *ngIf="isValidField('email')" class="text-danger">Correo no valido</mat-hint>
+    </mat-form-field>
+    <br>
+
+    <mat-form-field>
+      <mat-label>Contraseña</mat-label>
+      <input type="password" matInput formControlName="password" placeholder="Ingrese su contraseña">
+      <mat-hint *ngIf="isValidField('password')" class="text-danger">Ingrese 6 caracteres y al menos un n&uacute;mero y una may&uacute;scula</mat-hint>
+    </mat-form-field>
+    <br>
+
+    <mat-form-field>
+      <mat-label>Pregunta de Seguridad</mat-label>
+      <mat-select formControlName="question">
+        <mat-option value="pais">C&uacute;al es tu pa&iacute;s favorito?</mat-option>
+        <mat-option value="comida">C&uacute;al es tu comida favorita?</mat-option>
+        <mat-option value="cantante">C&uacute;al es tu cantante favorito?</mat-option>
+      </mat-select>
+      <mat-hint *ngIf="isValidField('question')" class="text-danger">Escoja una pregunta</mat-hint>
+    </mat-form-field>
+
+    <br>
+    <mat-form-field>
+      <mat-label>Respuesta</mat-label>
+      <input type="text" matInput formControlName="answer" placeholder="Ingrese la respuesta a la pregunta">
+      <mat-hint *ngIf="isValidField('answer')" class="text-danger">Ingrese la respuesta</mat-hint>
+    </mat-form-field>
+
+    <div class="p-4 ">
+      <button mat-flat-button color="primary" type="submit">
+        <mat-icon>save</mat-icon>
+        Crear
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="errorMessage" class="text-danger text-center mb-4">
+    {{errorMessage}}
+  </div>
+
+  <div class="flex justify-content-end p-2">
+    <a routerLink="/auth/login" class="btn btn-sm btn-success">Tengo cuenta</a>
+  </div>

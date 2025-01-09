@@ -1,0 +1,15 @@
+version: '3'
+
+
+services:
+  cards-db:
+    image: postgres:14.11
+    restart: always
+    ports:
+      - "5402:5432"
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD_CARDS}
+      POSTGRES_DB: ${DB_NAME_CARDS}
+    container_name: deckexcdbcards
+    volumes:
+      - ./postgres_cards:/var/lib/postgresql/data

@@ -1,0 +1,56 @@
+  <h1 class="mt-5">Recuperar Contraseña</h1>
+
+  <form  [formGroup]="emailForm" (ngSubmit)="emailControl(emailForm.controls['email'].value)" *ngIf="!recoveryControl">
+
+    <mat-form-field class="mt-5">
+      <mat-label>Correo electr&oacute;nico</mat-label>
+      <input type="email" matInput formControlName="email" placeholder="Ingrese su correo electr&oacute;nico">
+      <mat-hint *ngIf="isValidFieldEmail('email')" class="text-danger">Correo no valido</mat-hint>
+    </mat-form-field>
+    <br>
+
+    <div class="p-4 ">
+      <button mat-flat-button color="primary" type="submit">
+        <mat-icon>mail</mat-icon>
+        Verificar correo electr&oacute;nico
+      </button>
+    </div>
+
+    <div *ngIf="errorMessageControl" class="text-danger text-center mb-4">
+      {{errorMessageControl}}
+    </div>
+  </form>
+
+
+  <form  [formGroup]="recoveryForm" (ngSubmit)="onSubmit()" *ngIf="recoveryControl">
+    <h4>Recuperar de: <strong> {{emailForm.controls['email'].value}} </strong></h4>
+    <br>
+    <h4 class="text-start ml-5">{{question}}</h4>
+    <mat-form-field>
+      <mat-label>Respuesta a pregunta de Emergencia</mat-label>
+      <input type="text" matInput formControlName="answer" placeholder="Ingrese su respuesta">
+      <mat-hint *ngIf="isValidField('answer')" class="text-danger">Ingresar respuesta</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Nueva Contraseña</mat-label>
+      <input type="password" matInput formControlName="newPassword" placeholder="Nueva Contraseña">
+      <mat-hint *ngIf="isValidField('newPassword')" class="text-danger">Ingresar nueva contraseña</mat-hint>
+    </mat-form-field>
+    <br>
+
+    <div *ngIf="errorMessage" class="text-danger  mb-4">
+      {{errorMessage}}
+    </div>
+
+    <div class="p-4 ">
+      <button mat-flat-button color="primary" type="submit">
+        <mat-icon>save</mat-icon>
+        Guardar
+      </button>
+    </div>
+  </form>
+
+  <div class="flex justify-content-end p-2">
+    <a routerLink="/auth/login" class="btn btn-sm btn-success">Tengo cuenta</a>
+  </div>
