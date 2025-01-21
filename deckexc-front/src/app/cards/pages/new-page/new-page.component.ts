@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CardsService } from '../../services/cards.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { OffersInterface } from '../../../interfaces/oferta.interface';
 import { switchMap } from 'rxjs';
 import { CardInterface } from '../../../interfaces/card.interface';
+import { descriptionValidator } from 'src/app/shared/services/validators.service';
 
 @Component({
   selector: 'app-new-page',
@@ -17,9 +18,9 @@ export class NewPageComponent implements OnInit {
   // Formulario reactivo
   public cardForm = new FormGroup({
     cardId: new FormControl<string>('', { nonNullable: true }),
-    description: new FormControl<string>('', { nonNullable: true }),
+    description: new FormControl<string>('', [Validators.required, Validators.maxLength(150), descriptionValidator()]),
     condition: new FormControl<string>('', { nonNullable: true }),
-    price: new FormControl<number>(0, { nonNullable: true }),
+    price: new FormControl<number>(0, [Validators.required, Validators.min(0)]),
   });
 
 
@@ -67,10 +68,10 @@ export class NewPageComponent implements OnInit {
   onSubmit(): void {
     // if (this.cardForm.invalid) return;
     const cardId = this.cardForm.controls['cardId'].value
-    const description = this.cardForm.controls['description'].value
+    const description = this.cardForm.controls['description'].value || '';
     const condition = this.cardForm.controls['condition'].value
-    const price = this.cardForm.controls['price'].value
-    this.cardSrv.addOffer(cardId, description, condition, price)
+    const price = this.cardForm.controls['price'].value || 0;
+    this.cardSrv.addOffer(cardId, description, condition, price) 
 
       .subscribe(card => {
         // Navegara a la pagina de edicion del nuevo heroe

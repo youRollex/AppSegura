@@ -49,3 +49,13 @@ return (control: AbstractControl): ValidationErrors | null => {
   return null;
 };
 }
+
+export function descriptionValidator(): ValidatorFn {
+  const descriptionRegex = /^[A-Za-z0-9áéíóúÁÉÍÓÚ\s]+$/; 
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (control.value && !descriptionRegex.test(control.value)) {
+      return { invalidDescription: 'La descripción solo puede contener letras, números y espacios.' };
+    }
+    return null;
+  };
+}

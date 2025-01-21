@@ -27,8 +27,14 @@
           </mat-form-field>
 
           <mat-form-field class="col-12 col-sm-6">
-            <mat-label>Descripci&oacute;n</mat-label>
+            <mat-label>Descripción</mat-label>
             <input matInput type="text" required formControlName="description">
+            <mat-hint *ngIf="cardForm.controls['description'].hasError('maxlength')" class="text-danger">
+              La descripción no puede superar los 150 caracteres.
+            </mat-hint>
+            <mat-hint *ngIf="cardForm.controls['description'].hasError('invalidDescription') && cardForm.controls['description'].touched" class="text-danger">
+              La descripción solo puede contener letras, números y espacios.
+            </mat-hint>
           </mat-form-field>
 
           <mat-form-field class="col-12 col-sm-6">
@@ -42,7 +48,13 @@
 
           <mat-form-field class="col-12 col-sm-6">
             <mat-label>Precio</mat-label>
-            <input matInput type="number" required formControlName="price">
+            <input matInput type="number" required formControlName="price" min="0">
+            <mat-error *ngIf="cardForm.controls['price'].hasError('min')">
+              No se pueden ingresar valores negativos.
+            </mat-error>
+            <mat-error *ngIf="cardForm.controls['price'].hasError('required')">
+              El precio es obligatorio.
+            </mat-error>
           </mat-form-field>
 
         </form>

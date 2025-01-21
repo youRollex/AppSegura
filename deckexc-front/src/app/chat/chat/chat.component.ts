@@ -57,16 +57,27 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  sendMessage(): void {
-    if (this.message.trim().length === 0) {
-      return;
-    }
+  private lastMessage: string = '';
+  private lastMessageTime: number = 0;
 
+  sendMessage(): void {
+    const now = Date.now();
+    if (this.message === this.lastMessage && now - this.lastMessageTime < 3000) {
+      console.log('Este mensaje ya fue enviado recientemente.');
+      return; 
+    }
+  
+    if (this.message.trim().length === 0 || this.message.length > 150) {
+      return; 
+    }
+  
     if (this.socket) {
       this.socket.emit('message-from-client', {
         message: this.message,
       });
-
+  
+      this.lastMessage = this.message; 
+      this.lastMessageTime = now; 
       this.message = '';
     }
   }

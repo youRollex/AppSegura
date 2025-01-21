@@ -14,6 +14,9 @@
   </div>
   <div class="chat-input">
     <input [(ngModel)]="message" placeholder="Escribe un mensaje" (keyup.enter)="sendMessage()" />
+    <mat-hint *ngIf="message.length > 150" class="text-danger">
+      El mensaje no puede superar los 150 caracteres.
+    </mat-hint>
     <button mat-flat-button (click)="sendMessage()">Enviar</button>
   </div>
 </div>
