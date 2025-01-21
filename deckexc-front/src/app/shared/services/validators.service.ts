@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormGroup, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormGroup, ValidatorFn, ValidationErrors } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -25,5 +25,27 @@ export function containsUpperCaseValidator(): ValidatorFn {
 return (control: AbstractControl): { [key: string]: any } | null => {
     const containsUpperCase = /[A-Z]/.test(control.value);
     return containsUpperCase ? null : { 'missingUpperCase': true };
+};
+}
+
+export function nameValidator(): ValidatorFn {
+const nameRegex = /^[A-Za-záéíóúÁÉÍÓÚ\s]+$/;
+return (control: AbstractControl): ValidationErrors | null => {
+  if (control.value && !nameRegex.test(control.value)){
+    return { invalidName: 'El nombre solo puede contener letras y espacios'};
+  }
+  return null;
+};
+}
+
+
+const commonPasswords = [ '123456', 'password', '123456789', 'qwerty', 'abc123', 'password123', '12345', '1234', '111111', 'letmein'];
+
+export function commonPasswordValidator(): ValidatorFn {
+return (control: AbstractControl): ValidationErrors | null => {
+  if (control.value && commonPasswords.includes(control.value.toLowerCase())) {
+    return { commonPassword: true };
+  }
+  return null;
 };
 }

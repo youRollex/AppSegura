@@ -5,7 +5,7 @@
     <mat-form-field class="mt-5">
       <mat-label>Nombre</mat-label>
       <input type="text" matInput formControlName="name" placeholder="Ingrese su nombre">
-      <mat-hint *ngIf="isValidField('name')" class="text-danger">Ingrese su nombre</mat-hint>
+      <mat-hint *ngIf="isValidField('name')" class="text-danger">Ingrese un nombre válido (solo letras y espacios)</mat-hint>
     </mat-form-field>
     <br>
 
@@ -19,7 +19,12 @@
     <mat-form-field>
       <mat-label>Contraseña</mat-label>
       <input type="password" matInput formControlName="password" placeholder="Ingrese su contraseña">
-      <mat-hint *ngIf="isValidField('password')" class="text-danger">Ingrese 6 caracteres y al menos un n&uacute;mero y una may&uacute;scula</mat-hint>
+      <mat-hint *ngIf="isValidField('password') && !registerForm.controls['password'].hasError('commonPassword')" class="text-danger">
+        Ingrese 6 caracteres y al menos un número y una mayúscula
+      </mat-hint>
+      <mat-hint *ngIf="registerForm.controls['password'].hasError('commonPassword')" class="text-danger">
+        La contraseña es demasiado común. Elija una contraseña más segura.
+      </mat-hint>
     </mat-form-field>
     <br>
 
@@ -37,7 +42,12 @@
     <mat-form-field>
       <mat-label>Respuesta</mat-label>
       <input type="text" matInput formControlName="answer" placeholder="Ingrese la respuesta a la pregunta">
-      <mat-hint *ngIf="isValidField('answer')" class="text-danger">Ingrese la respuesta</mat-hint>
+      <mat-hint *ngIf="isValidField('answer') && !registerForm.controls['answer'].hasError('minlength')" class="text-danger">
+        Ingrese la respuesta
+      </mat-hint>
+      <mat-hint *ngIf="registerForm.controls['answer'].hasError('minlength') && registerForm.controls['answer'].dirty" class="text-danger">
+        Respuesta muy corta. Debe tener al menos 3 caracteres.
+      </mat-hint>
     </mat-form-field>
 
     <div class="p-4 ">

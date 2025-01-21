@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ValidatorsService, containsNumberValidator, containsUpperCaseValidator } from '../../../shared/services/validators.service';
+import { ValidatorsService, commonPasswordValidator, containsNumberValidator, containsUpperCaseValidator, nameValidator } from '../../../shared/services/validators.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -16,10 +16,10 @@ export class RegisterPageComponent {
   public errorMessage: string = '';
   public registerForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.pattern(this.validatorSrv.emailPattern)]],
-    name: ['', [Validators.required]],
-    password: ['', [Validators.required, containsNumberValidator(), containsUpperCaseValidator(), Validators.minLength(6)]],
+    name: ['', [Validators.required, nameValidator()]],
+    password: ['', [Validators.required, containsNumberValidator(), containsUpperCaseValidator(), Validators.minLength(6), commonPasswordValidator()]],
     question: ['', [Validators.required]],
-    answer: ['', [Validators.required]],
+    answer: ['', [Validators.required, Validators.minLength(4)]],
   })
 
   constructor(
@@ -36,6 +36,7 @@ export class RegisterPageComponent {
 
   onSubmit() {
     this.registerForm.markAllAsTouched();
+    if (this.registerForm.invalid){return;}
     const email = this.registerForm.controls['email'].value;
     const name = this.registerForm.controls['name'].value;
     const password = this.registerForm.controls['password'].value;

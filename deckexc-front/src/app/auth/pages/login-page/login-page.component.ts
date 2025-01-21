@@ -34,20 +34,42 @@ export class LoginPageComponent implements OnInit{
   }
 
 
-  isValidField( field:string ){
-    return this.validatorSrv.isValidField( this.loginForm, field)
+  isValidField(field: string): string | null {
+    const control = this.loginForm.get(field);
+    if (control?.hasError('required')) {
+      return 'Este campo es obligatorio.';
+    } else if (control?.hasError('pattern')) {
+      return 'Formato de correo inválido.';
+    } else if (control?.hasError('minlength')) {
+      return 'La contraseña debe tener al menos 6 caracteres.';
+    } else if (control?.hasError('containsNumber')) {
+      return 'La contraseña debe incluir al menos un número.';
+    } else if (control?.hasError('containsUpperCase')) {
+      return 'La contraseña debe incluir al menos una letra mayúscula.';
+    }
+    return null;
   }
 
   onSubmit(){
     this.loginForm.markAllAsTouched();
+
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Por favor, completa todos los campos correctamente.';
+      return;
+    }
+
     this.authService.login(this.loginForm.controls['email'].value, this.loginForm.controls['password'].value)
       .subscribe(
         (data) => {
           this.router.navigate(['/cards'])
           this.errorMessage = '';
         },
-        (error) => {
-          this.errorMessage = 'Credenciales incorrectas. Intentalo de nuevo'
+      (error) => {
+          if (error.status === 401) {
+            this.errorMessage = 'Correo o contraseña incorrectos.';
+          } else {
+            this.errorMessage = 'Error inesperado. Intenta más tarde.';
+          }
         }
       )
   }

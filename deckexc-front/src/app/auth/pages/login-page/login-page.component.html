@@ -5,7 +5,7 @@
     <mat-form-field class="mt-5">
       <mat-label>Correo electr&oacute;nico</mat-label>
       <input type="email" matInput formControlName="email" placeholder=" Ingrese su correo electr&oacute;nico" value="email">
-      <mat-hint *ngIf="isValidField('email')" class="text-danger">Correo no valido</mat-hint>
+      <mat-hint *ngIf="isValidField('email')" class="text-danger">{{ isValidField('email') }}</mat-hint>
       </mat-form-field>
       <br>
 
