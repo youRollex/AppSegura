@@ -53,15 +53,40 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true, id: true },
+      select: { email: true, password: true, id: true, failedLoginAttempts: true, accountLockedUntil:true },
     });
 
     if (!user)
       throw new UnauthorizedException('Credentals are not valid (email)');
+    
+    // Verificar si la cuenta esta bloqueada
+    if (user.accountLockedUntil && user.accountLockedUntil > new Date().getTime()){
+      const lockTimeRemaining = (user.accountLockedUntil - new Date().getTime()) /1000;
+      throw new UnauthorizedException(`Account is locked. Try again in ${lockTimeRemaining.toFixed(0)} seconds`);
+    }
+
+    // Comparar la Contraseña
     if (!bcrypt.compareSync(password, user.password))
-      throw new UnauthorizedException('Credentals are not valid (password)');
+      throw new UnauthorizedException(`Credentials are not valid (password)`);
+
+    // Restablecer intentos fallidos y desbloquear cuenta
+    user.failedLoginAttempts = 0;
+    user.accountLockedUntil = 0;  // Desbloquea inmediato si es login exitoso
+    await this.userRepository.save(user);
 
     return { ...user, token: this.getJwtToken({ id: user.id }) };
+  }
+
+  // Metodo de validacion de Login para contar intentos fallidos
+  async handleFailedLogin(user: User){
+    user.failedLoginAttempts += 1;
+
+    if (user.failedLoginAttempts >= 4){
+      // Bloquear la cuenta por 3 minutos después de 4 intentos fallidos
+      user.accountLockedUntil = new Date().getTime() + 3 * 60 * 1000; // 3 Minutos
+    }
+
+    await this.userRepository.save(user);
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
