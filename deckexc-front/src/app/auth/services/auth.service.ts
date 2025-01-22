@@ -25,8 +25,8 @@ export class AuthService {
     return structuredClone( this.user );
   }
 
-  login(email: string, password: string): Observable<User> {
-    return this.http.post<User>(`${this.baseUrl}/auth/login`, { email, password })
+  login(email: string, password: string, captchaToken: string | null): Observable<User> {
+    return this.http.post<User>(`${this.baseUrl}/auth/login`, { email, password,captchaToken })
       .pipe(
         map((data: User) => {
           localStorage?.setItem('token', data.token);

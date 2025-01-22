@@ -3,15 +3,21 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ValidatorsService, containsNumberValidator, containsUpperCaseValidator } from '../../../shared/services/validators.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { RecaptchaModule } from 'ng-recaptcha';
+import { environments } from 'src/app/environments/environments';
 
 @Component({
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
-  styleUrls: ['./login-page.component.css']
+  styleUrls: ['./login-page.component.css'],
 })
 export class LoginPageComponent implements OnInit{
 
   public errorMessage: string = '';
+  public siteKey = environments.recaptcha.siteKey; 
+  public captchaResolved: boolean = false;
+  private captchaToken:string|null = null;
+  
   public loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.pattern(this.validatorSrv.emailPattern)]],
     password: ['', [Validators.required, containsNumberValidator(), containsUpperCaseValidator(), Validators.minLength(6) ]]
@@ -50,6 +56,11 @@ export class LoginPageComponent implements OnInit{
     return null;
   }
 
+  onCaptchaResolved(token: string|null) {
+    this.captchaToken = token;
+    this.captchaResolved = true;
+  }
+
   onSubmit(){
     this.loginForm.markAllAsTouched();
 
@@ -57,8 +68,7 @@ export class LoginPageComponent implements OnInit{
       this.errorMessage = 'Por favor, completa todos los campos correctamente.';
       return;
     }
-
-    this.authService.login(this.loginForm.controls['email'].value, this.loginForm.controls['password'].value)
+    this.authService.login(this.loginForm.controls['email'].value, this.loginForm.controls['password'].value , this.captchaToken)
       .subscribe(
         (data) => {
           this.router.navigate(['/cards'])

@@ -4,11 +4,13 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { HttpService } from '@nestjs/axios';
-import { lastValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
+import * as qs from 'qs';
 
 @Injectable()
 export class AuthService {
   private readonly AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL;
+  private readonly SECRET_KEY = process.env.SECRET_KEY;
 
   constructor(private readonly httpService: HttpService) {}
 
@@ -28,6 +30,17 @@ export class AuthService {
 
   async login(loginUserDto: LoginUserDto) {
     try {
+      const { captchaToken } = loginUserDto;
+      if (!captchaToken) {
+        this.handleHttpExceptions('Captcha es obligatorio.');
+      }
+
+      const isCaptchaValid = await this.validateCaptcha(captchaToken);
+
+      if (!isCaptchaValid) {
+        this.handleHttpExceptions('Captcha inválido.');
+      }
+      
       const response = await lastValueFrom(
         this.httpService.post(
           `${this.AUTH_SERVICE_URL}/auth/login`,
@@ -79,5 +92,30 @@ export class AuthService {
   private handleHttpExceptions(error: any) {
     console.error('Error en la solicitud HTTP:', error);
     throw new Error('Error en la solicitud HTTP');
+  }
+
+  private async validateCaptcha(token: string): Promise<boolean> {
+    try {
+      const body = qs.stringify({
+        secret: this.SECRET_KEY,
+        response: token,
+      });
+
+      const response = await firstValueFrom(
+        this.httpService.post(
+          'https://www.google.com/recaptcha/api/siteverify',
+          body,
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          },
+        ),
+      );
+      return response.data.success;
+    } catch (error) {
+      console.error('Error validating captcha:', error.message);
+      return false;
+    }
   }
 }

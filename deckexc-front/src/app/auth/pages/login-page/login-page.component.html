@@ -1,34 +1,59 @@
-  <h1 class="mt-5">Login</h1>
+<h1 class="mt-5">Login</h1>
 
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <mat-form-field class="mt-5">
+    <mat-label>Correo electr&oacute;nico</mat-label>
+    <input
+      type="email"
+      matInput
+      formControlName="email"
+      placeholder=" Ingrese su correo electr&oacute;nico"
+      value="email"
+    />
+    <mat-hint *ngIf="isValidField('email')" class="text-danger">{{
+      isValidField("email")
+    }}</mat-hint>
+  </mat-form-field>
+  <br />
 
-    <mat-form-field class="mt-5">
-      <mat-label>Correo electr&oacute;nico</mat-label>
-      <input type="email" matInput formControlName="email" placeholder=" Ingrese su correo electr&oacute;nico" value="email">
-      <mat-hint *ngIf="isValidField('email')" class="text-danger">{{ isValidField('email') }}</mat-hint>
-      </mat-form-field>
-      <br>
+  <mat-form-field class="mt-3">
+    <mat-label>Contraseña</mat-label>
+    <input
+      type="password"
+      matInput
+      formControlName="password"
+      placeholder="Ingrese su contraseña"
+      value="password"
+    />
+    <mat-hint *ngIf="isValidField('password')" class="text-danger"
+      >Contraseña debe ser de m&iacute;nimo 6 caracteres</mat-hint
+    >
+  </mat-form-field>
 
-      <mat-form-field class="mt-3">
-        <mat-label>Contraseña</mat-label>
-        <input type="password" matInput formControlName="password" placeholder="Ingrese su contraseña" value="password">
-        <mat-hint *ngIf="isValidField('password')" class="text-danger">Contraseña debe ser de m&iacute;nimo 6 caracteres</mat-hint>
-    </mat-form-field>
-
-    <div class="p-4">
-      <button mat-flat-button color="primary" type="submit">
-        <mat-icon>save</mat-icon>
-        Ingresar
-      </button>
-    </div>
-  </form>
-
-  <div *ngIf="errorMessage" class="text-danger text-center mb-4">
-    {{errorMessage}}
+  <div class="captcha-container mt-4" style="display: flex; justify-content: center;">
+    <re-captcha [siteKey]="siteKey" (resolved)="onCaptchaResolved($event)">
+    </re-captcha>
   </div>
-
-  <a routerLink="/auth/recovery">Olvidaste tu contraseña?</a>
-
-  <div class="flex justify-content-end p-2">
-    <a routerLink="/auth/register" class="btn btn-sm btn-success">Crear cuenta</a>
+  
+  <div class="p-4">
+    <button
+      mat-flat-button
+      color="primary"
+      type="submit"
+      [disabled]="!loginForm.valid || !captchaResolved"
+    >
+      <mat-icon>save</mat-icon>
+      Ingresar
+    </button>
   </div>
+</form>
+
+<div *ngIf="errorMessage" class="text-danger text-center mb-4">
+  {{ errorMessage }}
+</div>
+
+<a routerLink="/auth/recovery">Olvidaste tu contraseña?</a>
+
+<div class="flex justify-content-end p-2">
+  <a routerLink="/auth/register" class="btn btn-sm btn-success">Crear cuenta</a>
+</div>

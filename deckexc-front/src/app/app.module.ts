@@ -8,6 +8,7 @@ import { LayoutPageComponent } from './auth/pages/layout-page/layout-page.compon
 import { LoginPageComponent } from './auth/pages/login-page/login-page.component';
 import { RecoveryPageComponent } from './auth/pages/recovery-page/recovery-page.component';
 import { RegisterPageComponent } from './auth/pages/register-page/register-page.component';
+import { RecaptchaModule } from 'ng-recaptcha';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { RegisterPageComponent } from './auth/pages/register-page/register-page.
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    HttpClientModule
+    HttpClientModule,
+    RecaptchaModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
