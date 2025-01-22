@@ -75,11 +75,16 @@ export class LoginPageComponent implements OnInit{
           this.errorMessage = '';
         },
       (error) => {
-          if (error.status === 401) {
-            this.errorMessage = 'Correo o contraseña incorrectos.';
+        if (error.status === 401) {
+          if (error.error.message && error.error.message.includes('Account is locked')) {
+            // Mensaje de cuenta bloqueada
+            this.errorMessage = 'Tu cuenta está bloqueada. Por favor, contacta al soporte.';
           } else {
-            this.errorMessage = 'Error inesperado. Intenta más tarde.';
+            this.errorMessage = 'Correo o contraseña incorrectos.';
           }
+        } else {
+          this.errorMessage = 'Error inesperado. Intenta más tarde.';
+        }
         }
       )
   }
