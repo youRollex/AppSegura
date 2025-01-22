@@ -1,9 +1,10 @@
-import { Post, Body, Param } from '@nestjs/common';
+import { Post, Body, Param, Delete } from '@nestjs/common';
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -32,5 +33,20 @@ export class AuthController {
   @Get('question/:email')
   getQuestion(@Param('email') email: string) {
     return this.authService.getQuestion(email);
+  }
+
+  @Post('payment')
+  createPaymentDetails(@Body() createPaymentDetails: CreatePaymentDetailDto ){
+    return this.authService.createPaymentDetail(createPaymentDetails);
+  }
+
+  @Delete('payment/:userId')
+  deletePaymentDetail(@Param('userId') userInfo: string){
+    return this.authService.deletePaymentDetail(userInfo);
+  }
+
+  @Get('payment/:userId')
+  getPaymentDetailsByUser(@Param('userId') userInfo: string){
+    return this.authService.findPaymentDetailByUser(userInfo);
   }
 }

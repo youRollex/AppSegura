@@ -6,6 +6,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
 import * as qs from 'qs';
+import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +41,7 @@ export class AuthService {
       if (!isCaptchaValid) {
         this.handleHttpExceptions('Captcha inválido.');
       }
-      
+
       const response = await lastValueFrom(
         this.httpService.post(
           `${this.AUTH_SERVICE_URL}/auth/login`,
@@ -116,6 +117,47 @@ export class AuthService {
     } catch (error) {
       console.error('Error validating captcha:', error.message);
       return false;
+    }
+  }
+
+  async createPaymentDetail(createPaymentDetails: CreatePaymentDetailDto) {
+    try {
+      const response = await lastValueFrom(
+        this.httpService.post(
+          `${this.AUTH_SERVICE_URL}/auth/payment`,
+          createPaymentDetails,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.handleHttpExceptions(error);
+    }
+  }
+
+  async deletePaymentDetail(userInfo: string) {
+    try {
+      const response = await lastValueFrom(
+        this.httpService.delete(
+          `${this.AUTH_SERVICE_URL}/auth/payment/${userInfo}`,
+        ),
+      );
+
+      return response.data;
+    } catch (error) {
+      this.handleHttpExceptions(error);
+    }
+  }
+
+  async findPaymentDetailByUser(userInfo: string) {
+    try {
+      const response = await lastValueFrom(
+        this.httpService.get(
+          `${this.AUTH_SERVICE_URL}/auth/payment/${userInfo}`,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.handleHttpExceptions(error);
     }
   }
 }

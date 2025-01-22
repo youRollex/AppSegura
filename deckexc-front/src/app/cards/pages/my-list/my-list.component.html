@@ -6,3 +6,70 @@
     <app-my-card [offers]="card"></app-my-card>
   </div>
 </div>
+
+<mat-divider></mat-divider>
+
+<h2 class="mt-5">Agregar Método de Pago</h2>
+
+<div class="payment-method-container">
+  <form [formGroup]="paymentForm" (ngSubmit)="onSubmitPaymentMethod()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Número de tarjeta</mat-label>
+      <input
+        matInput
+        type="text"
+        formControlName="cardNumber"
+        placeholder="Ingrese el número de la tarjeta"
+        maxlength="16"
+      />
+      <mat-error *ngIf="paymentForm.get('cardNumber')?.hasError('required')">
+        El número de tarjeta es obligatorio.
+      </mat-error>
+      <mat-error *ngIf="paymentForm.get('cardNumber')?.hasError('pattern')">
+        Número de tarjeta inválido.
+      </mat-error>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="fill" class="half-width">
+        <mat-label>Fecha de vencimiento</mat-label>
+        <input
+          matInput
+          type="text"
+          formControlName="expiryDate"
+          placeholder="MM/AA"
+          maxlength="5"
+        />
+        <mat-error *ngIf="paymentForm.get('expiryDate')?.hasError('required')">
+          La fecha de vencimiento es obligatoria.
+        </mat-error>
+        <mat-error *ngIf="paymentForm.get('expiryDate')?.hasError('pattern')">
+          Formato de fecha inválido. Usa MM/AA.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="half-width">
+        <mat-label>CVC</mat-label>
+        <input
+          matInput
+          type="password"
+          formControlName="cvc"
+          placeholder="CVC"
+          maxlength="3"
+        />
+        <mat-error *ngIf="paymentForm.get('cvc')?.hasError('required')">
+          El CVC es obligatorio.
+        </mat-error>
+        <mat-error *ngIf="paymentForm.get('cvc')?.hasError('pattern')">
+          CVC inválido.
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="action-buttons">
+      <button mat-flat-button color="primary" type="submit" [disabled]="paymentForm.invalid">
+        Guardar Método de Pago
+      </button>
+    </div>
+  </form>
+</div>

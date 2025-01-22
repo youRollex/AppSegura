@@ -9,17 +9,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { JwtPayLoad } from './interfaces/jwt-payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
+import { BankDetails } from './entities/user.bankDetails.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(BankDetails)
+    private readonly bank_detailsRepository: Repository<BankDetails>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -118,5 +123,118 @@ export class AuthService {
 
   async findByEmail(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email } });
+  }
+
+  async createPaymentDetail(createPaymentDetails: CreatePaymentDetailDto) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: createPaymentDetails.userId },
+      });
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const encryptedCardNumber = this.encryptData(
+        createPaymentDetails.cardNumber,
+      );
+      const encryptedCvc = this.encryptData(createPaymentDetails.cvc);
+      const encryptedExpirationDate = this.encryptData(
+        createPaymentDetails.expirationDate,
+      );
+
+      const bankDetail = this.bank_detailsRepository.create({
+        ...createPaymentDetails,
+        cardNumber: encryptedCardNumber,
+        cvc: encryptedCvc,
+        expirationDate: encryptedExpirationDate,
+      });
+      await this.bank_detailsRepository.save(bankDetail);
+      return {
+        id: bankDetail.id,
+        userId: bankDetail.userId,
+        cardNumber: this.maskCardNumber(
+          this.decryptData(bankDetail.cardNumber),
+        ),
+        cvc: '***',
+        expirationDate: this.maskExpirationDate(
+          this.decryptData(bankDetail.expirationDate),
+        ),
+      };
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  }
+
+  private encryptData(data: string): string {
+    const key = crypto
+      .createHash('sha256')
+      .update(process.env.ENCRYPTION_KEY)
+      .digest('hex')
+      .slice(0, 32);
+
+    const iv = crypto
+      .createHash('sha256')
+      .update(process.env.ENCRYPTION_IV)
+      .digest('hex')
+      .slice(0, 16);
+
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    let encrypted = cipher.update(data, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return encrypted;
+  }
+
+  private decryptData(encryptedData: string): string {
+    const key = crypto
+      .createHash('sha256')
+      .update(process.env.ENCRYPTION_KEY)
+      .digest('hex')
+      .slice(0, 32);
+
+    const iv = crypto
+      .createHash('sha256')
+      .update(process.env.ENCRYPTION_IV)
+      .digest('hex')
+      .slice(0, 16);
+
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  }
+
+  private maskCardNumber(cardNumber: string): string {
+    return cardNumber.replace(/\d(?=\d{4})/g, '*');
+  }
+
+  private maskExpirationDate(expirationDate: string): string {
+    const [year, month] = expirationDate.split('/');
+    return `**/${month}/${year.slice(2)}`;
+  }
+
+  async deletePaymentDetail(userInfo: string) {
+    const paymentDetail = await this.bank_detailsRepository.findOne({
+      where: { userId: userInfo },
+    });
+
+    if (!paymentDetail) {
+      throw new NotFoundException('Payment detail not found');
+    }
+
+    await this.bank_detailsRepository.remove(paymentDetail);
+
+    return { message: 'Payment detail successfully deleted' };
+  }
+
+  async findPaymentDetailByUser(userInfo: string) {
+    const paymentDetails = await this.bank_detailsRepository.findOne({
+      where: { userId: userInfo },
+    });
+
+    if (!paymentDetails) {
+      throw new NotFoundException('No payment details found for this user');
+    }
+
+    return paymentDetails;
   }
 }
