@@ -7,75 +7,127 @@ import { OffersInterface } from '../../interfaces/oferta.interface';
 import { error } from 'console';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CardsService {
-
   private baseUrl: string = environments.deckBack;
 
-  constructor( private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getCards(): Observable<CardInterface[]>{
+  getCards(): Observable<CardInterface[]> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    })
+      Authorization: `Bearer ${token}`,
+    });
     return this.http.get<CardInterface[]>(`${this.baseUrl}/cards`, { headers });
   }
 
-  getOffers(): Observable<OffersInterface[]>{
+  getOffers(): Observable<OffersInterface[]> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    })
-    return this.http.get<OffersInterface[]>(`${this.baseUrl}/offers`, { headers });
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.get<OffersInterface[]>(`${this.baseUrl}/offers`, {
+      headers,
+    });
   }
 
-  getMyOffers(): Observable<OffersInterface[]>{
+  getMyOffers(): Observable<OffersInterface[]> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    })
-    return this.http.get<OffersInterface[]>(`${this.baseUrl}/offers/user`, { headers });
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.get<OffersInterface[]>(`${this.baseUrl}/offers/user`, {
+      headers,
+    });
   }
 
-  getOfferById( id: string ): Observable<OffersInterface|undefined>{
+  getOfferById(id: string): Observable<OffersInterface | undefined> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    })
-    return this.http.get<OffersInterface>(`${this.baseUrl}/offers/${id}`, { headers })
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http
+      .get<OffersInterface>(`${this.baseUrl}/offers/${id}`, { headers })
+      .pipe(catchError((error) => of(undefined)));
+  }
+
+  addOffer(
+    cardId: string,
+    description: string,
+    condition: string,
+    price: number
+  ): Observable<any> {
+    const token = localStorage?.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.post<any>(
+      `${this.baseUrl}/offers`,
+      { cardId, description, condition, price },
+      { headers }
+    );
+  }
+
+  updateOfferById(
+    cardId: string,
+    condition: string,
+    price: number
+  ): Observable<any> {
+    const token = localStorage?.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.patch<any>(
+      `${this.baseUrl}/offers/${cardId}`,
+      { condition, price },
+      { headers }
+    );
+  }
+
+  deleteOfferById(id: string): Observable<boolean> {
+    const token = localStorage?.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http.delete(`${this.baseUrl}/offers/${id}`, { headers }).pipe(
+      map((resp) => true),
+      catchError((err) => of(false))
+    );
+  }
+
+  getPaymentDetails(userId: string): Observable<any> {
+    const token = localStorage?.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    return this.http
+      .get<any>(`${this.baseUrl}/auth/payment/${userId}`, { headers })
       .pipe(
-        catchError(error => of(undefined))
-      )
+        catchError((err) => of(false))
+      );
   }
 
-  addOffer( cardId:string, description:string, condition:string, price:number): Observable<any>{
+  savePaymentMethod(paymentData: any): Observable<any> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    })
-    return this.http.post<any>(`${this.baseUrl}/offers`, {cardId, description, condition, price }, { headers })
+      Authorization: `Bearer ${token}`,
+    });
+
+    return this.http.post(`${this.baseUrl}/auth/payment`, paymentData, {
+      headers,
+    });
   }
 
-  updateOfferById(cardId:string, condition:string, price:number): Observable<any>{
+  updatePaymentMethod(updatedPaymentData: any): Observable<any> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    })
-    return this.http.patch<any>(`${this.baseUrl}/offers/${cardId}`,{condition, price}, { headers })
-  }
+      Authorization: `Bearer ${token}`,
+    });
 
-  deleteOfferById( id: string):Observable<boolean>{
-    const token = localStorage?.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-    })
-    return this.http.delete(`${this.baseUrl}/offers/${id}`, { headers })
-      .pipe(
-        map(resp => true),
-        catchError( err => of(false))
-      )
+    return this.http.patch(`${this.baseUrl}/auth/payment`, updatedPaymentData, {
+      headers,
+    });
   }
 
   logout() {
@@ -91,5 +143,4 @@ export class CardsService {
   set isOpen(isOpen: boolean) {
     this._isOpen = isOpen;
   }
-
 }

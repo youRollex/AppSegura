@@ -1,10 +1,12 @@
-import { Post, Body, Param, Delete } from '@nestjs/common';
+import { Post, Body, Param, Delete, Patch } from '@nestjs/common';
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
+import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
+import { Auth } from './decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -36,17 +38,25 @@ export class AuthController {
   }
 
   @Post('payment')
-  createPaymentDetails(@Body() createPaymentDetails: CreatePaymentDetailDto ){
+  @Auth()
+  createPaymentDetails(@Body() createPaymentDetails: CreatePaymentDetailDto) {
     return this.authService.createPaymentDetail(createPaymentDetails);
   }
 
   @Delete('payment/:userId')
-  deletePaymentDetail(@Param('userId') userInfo: string){
+  deletePaymentDetail(@Param('userId') userInfo: string) {
     return this.authService.deletePaymentDetail(userInfo);
   }
 
   @Get('payment/:userId')
-  getPaymentDetailsByUser(@Param('userId') userInfo: string){
+  @Auth()
+  getPaymentDetailsByUser(@Param('userId') userInfo: string) {
     return this.authService.findPaymentDetailByUser(userInfo);
+  }
+
+  @Patch('payment')
+  @Auth()
+  updatePaymentDetails(@Body() updatePaymentDetails: UpdatePaymentDetailDto) {
+    return this.authService.updatePaymentDetail(updatePaymentDetails);
   }
 }

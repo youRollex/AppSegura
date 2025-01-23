@@ -7,6 +7,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom, lastValueFrom } from 'rxjs';
 import * as qs from 'qs';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
+import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
 
 @Injectable()
 export class AuthService {
@@ -153,6 +154,20 @@ export class AuthService {
       const response = await lastValueFrom(
         this.httpService.get(
           `${this.AUTH_SERVICE_URL}/auth/payment/${userInfo}`,
+        ),
+      );
+      return response.data;
+    } catch (error) {
+      this.handleHttpExceptions(error);
+    }
+  }
+
+  async updatePaymentDetail(updatePaymentDetails: UpdatePaymentDetailDto) {
+    try {
+      const response = await lastValueFrom(
+        this.httpService.patch(
+          `${this.AUTH_SERVICE_URL}/auth/payment`,
+          updatePaymentDetails,
         ),
       );
       return response.data;

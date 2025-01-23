@@ -17,6 +17,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 import { BankDetails } from './entities/user.bankDetails.entity';
+import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
 
 @Injectable()
 export class AuthService {
@@ -58,35 +59,43 @@ export class AuthService {
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true, id: true, failedLoginAttempts: true, accountLockedUntil:true },
+      select: {
+        email: true,
+        password: true,
+        id: true,
+        failedLoginAttempts: true,
+        accountLockedUntil: true,
+      },
     });
 
     if (!user)
       throw new UnauthorizedException('Credentals are not valid (email)');
-    
+
+    /*
     // Verificar si la cuenta esta bloqueada
     if (user.accountLockedUntil && user.accountLockedUntil > new Date().getTime()){
       const lockTimeRemaining = (user.accountLockedUntil - new Date().getTime()) /1000;
       throw new UnauthorizedException(`Account is locked. Try again in ${lockTimeRemaining.toFixed(0)} seconds`);
-    }
+    }*/
 
     // Comparar la Contraseña
     if (!bcrypt.compareSync(password, user.password))
       throw new UnauthorizedException(`Credentials are not valid (password)`);
 
+    /*
     // Restablecer intentos fallidos y desbloquear cuenta
     user.failedLoginAttempts = 0;
     user.accountLockedUntil = 0;  // Desbloquea inmediato si es login exitoso
-    await this.userRepository.save(user);
+    await this.userRepository.save(user);*/
 
     return { ...user, token: this.getJwtToken({ id: user.id }) };
   }
 
   // Metodo de validacion de Login para contar intentos fallidos
-  async handleFailedLogin(user: User){
+  async handleFailedLogin(user: User) {
     user.failedLoginAttempts += 1;
 
-    if (user.failedLoginAttempts >= 4){
+    if (user.failedLoginAttempts >= 4) {
       // Bloquear la cuenta por 3 minutos después de 4 intentos fallidos
       user.accountLockedUntil = new Date().getTime() + 3 * 60 * 1000; // 3 Minutos
     }
@@ -234,7 +243,7 @@ export class AuthService {
 
   private maskExpirationDate(expirationDate: string): string {
     const [year, month] = expirationDate.split('/');
-    return `**/${month}/${year.slice(2)}`;
+    return `*${month.slice(1)}/**${year.slice(2)}`;
   }
 
   async deletePaymentDetail(userInfo: string) {
@@ -260,6 +269,52 @@ export class AuthService {
       throw new NotFoundException('No payment details found for this user');
     }
 
-    return paymentDetails;
+    return {
+      cardNumber: this.maskCardNumber(
+        this.decryptData(paymentDetails.cardNumber),
+      ),
+      cvc: '***',
+      expirationDate: this.maskExpirationDate(
+        this.decryptData(paymentDetails.expirationDate),
+      ),
+    };
+  }
+
+  async updatePaymentDetail(updatePaymentDetails: UpdatePaymentDetailDto) {
+    try {
+      const { userId, cardNumber, cvc, expirationDate } = updatePaymentDetails;
+
+      const existingPaymentDetail = await this.bank_detailsRepository.findOne({
+        where: { userId },
+      });
+
+      if (!existingPaymentDetail) {
+        throw new NotFoundException('Payment details not found for this user');
+      }
+
+      if (cardNumber) {
+        existingPaymentDetail.cardNumber = this.encryptData(cardNumber);
+      }
+
+      if (cvc) {
+        existingPaymentDetail.cvc = this.encryptData(cvc);
+      }
+
+      if (expirationDate) {
+        existingPaymentDetail.expirationDate = this.encryptData(expirationDate);
+      }
+
+      await this.bank_detailsRepository.save(existingPaymentDetail);
+
+      return {
+        cardNumber: cardNumber ? this.maskCardNumber(cardNumber) : undefined,
+        cvc: cvc ? '***' : undefined,
+        expirationDate: expirationDate
+          ? this.maskExpirationDate(expirationDate)
+          : undefined,
+      };
+    } catch (error) {
+      this.handlerDBErrors(error);
+    }
   }
 }
