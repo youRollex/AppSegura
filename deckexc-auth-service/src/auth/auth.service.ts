@@ -21,6 +21,8 @@ import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
 
 @Injectable()
 export class AuthService {
+  private atempts_num: number = 0;
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -68,25 +70,42 @@ export class AuthService {
       },
     });
 
-    if (!user)
+    if (!user) {
+      this.atempts_num += 1;
+      console.log('email not found count: ' + this.atempts_num);
       throw new UnauthorizedException('Credentals are not valid (email)');
+    }
 
-    /*
-    // Verificar si la cuenta esta bloqueada
-    if (user.accountLockedUntil && user.accountLockedUntil > new Date().getTime()){
-      const lockTimeRemaining = (user.accountLockedUntil - new Date().getTime()) /1000;
-      throw new UnauthorizedException(`Account is locked. Try again in ${lockTimeRemaining.toFixed(0)} seconds`);
-    }*/
+    if (this.atempts_num == 4 && user) {
+    }
 
     // Comparar la Contraseña
-    if (!bcrypt.compareSync(password, user.password))
+    if (!bcrypt.compareSync(password, user.password)) {
+      this.atempts_num++;
+      console.log('password not found count: ' + this.atempts_num);
       throw new UnauthorizedException(`Credentials are not valid (password)`);
+    }
 
-    /*
+    if (this.atempts_num == 4 && user) {
+    }
+    // Verificar si la cuenta esta bloqueada
+    if (
+      user.accountLockedUntil &&
+      user.accountLockedUntil > new Date().getTime()
+    ) {
+      const lockTimeRemaining =
+        (user.accountLockedUntil - new Date().getTime()) / 1000;
+      throw new UnauthorizedException(
+        `Account is locked. Try again in ${lockTimeRemaining.toFixed(0)} seconds`,
+      );
+    }
+    console.log('aa; ', new Date().getFullYear());
+    const timeTest = new Date().getTime() / 1000;
+    console.log('aaa; ', timeTest.toFixed(0));
     // Restablecer intentos fallidos y desbloquear cuenta
     user.failedLoginAttempts = 0;
-    user.accountLockedUntil = 0;  // Desbloquea inmediato si es login exitoso
-    await this.userRepository.save(user);*/
+    //user.accountLockedUntil = 0;  // Desbloquea inmediato si es login exitoso
+    await this.userRepository.save(user);
 
     return { ...user, token: this.getJwtToken({ id: user.id }) };
   }

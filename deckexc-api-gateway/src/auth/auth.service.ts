@@ -43,10 +43,15 @@ export class AuthService {
         this.handleHttpExceptions('Captcha inválido.');
       }
 
+      const data = {
+        email: loginUserDto.email,
+        password: loginUserDto.password
+      }
+
       const response = await lastValueFrom(
         this.httpService.post(
           `${this.AUTH_SERVICE_URL}/auth/login`,
-          loginUserDto,
+          data,
         ),
       );
       return response.data;

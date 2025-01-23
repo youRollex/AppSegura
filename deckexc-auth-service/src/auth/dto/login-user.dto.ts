@@ -20,6 +20,6 @@ export class LoginUserDto {
   })
   password: string;
 
-  @IsString()
-  captchaToken: string;
+  /*@IsString()
+  captchaToken?: string|null;*/
 }

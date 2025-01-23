@@ -58,6 +58,7 @@ export class LoginPageComponent implements OnInit{
 
   onCaptchaResolved(token: string|null) {
     this.captchaToken = token;
+    console.log('captcha token: ', this.captchaToken)
     this.captchaResolved = true;
   }
 
