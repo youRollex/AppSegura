@@ -21,8 +21,6 @@ import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
 
 @Injectable()
 export class AuthService {
-  private atempts_num: number = 0;
-
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -57,66 +55,57 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const { password, email } = loginUserDto;
+    const { email, password } = loginUserDto;
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: {
-        email: true,
-        password: true,
-        id: true,
-        failedLoginAttempts: true,
-        accountLockedUntil: true,
-      },
+      select: [
+        'email',
+        'password',
+        'id',
+        'failedLoginAttempts',
+        'accountLockedUntil',
+      ],
     });
 
     if (!user) {
-      this.atempts_num += 1;
-      console.log('email not found count: ' + this.atempts_num);
-      throw new UnauthorizedException('Credentals are not valid (email)');
+      throw new UnauthorizedException('Credenciales inválidas (email)');
     }
 
-    if (this.atempts_num == 4 && user) {
-    }
-
-    // Comparar la Contraseña
-    if (!bcrypt.compareSync(password, user.password)) {
-      this.atempts_num++;
-      console.log('password not found count: ' + this.atempts_num);
-      throw new UnauthorizedException(`Credentials are not valid (password)`);
-    }
-
-    if (this.atempts_num == 4 && user) {
-    }
-    // Verificar si la cuenta esta bloqueada
     if (
       user.accountLockedUntil &&
-      user.accountLockedUntil > new Date().getTime()
+      new Date().getTime() < user.accountLockedUntil.getTime()
     ) {
-      const lockTimeRemaining =
-        (user.accountLockedUntil - new Date().getTime()) / 1000;
+      const remainingTime =
+        (user.accountLockedUntil.getTime() - new Date().getTime()) / 1000;
       throw new UnauthorizedException(
-        `Account is locked. Try again in ${lockTimeRemaining.toFixed(0)} seconds`,
+        `La cuenta está bloqueada. Inténtalo nuevamente en ${remainingTime.toFixed(0)} segundos.`,
       );
     }
-    console.log('aa; ', new Date().getFullYear());
-    const timeTest = new Date().getTime() / 1000;
-    console.log('aaa; ', timeTest.toFixed(0));
-    // Restablecer intentos fallidos y desbloquear cuenta
+
+    if (!bcrypt.compareSync(password, user.password)) {
+      await this.handleFailedLogin(user);
+      throw new UnauthorizedException('Credenciales inválidas (contraseña)');
+    }
+
     user.failedLoginAttempts = 0;
-    //user.accountLockedUntil = 0;  // Desbloquea inmediato si es login exitoso
+    user.accountLockedUntil = null;
     await this.userRepository.save(user);
 
-    return { ...user, token: this.getJwtToken({ id: user.id }) };
+    return {
+      id: user.id,
+      email: user.email,
+      token: this.getJwtToken({ id: user.id }),
+    };
   }
 
-  // Metodo de validacion de Login para contar intentos fallidos
-  async handleFailedLogin(user: User) {
+  private async handleFailedLogin(user: User) {
     user.failedLoginAttempts += 1;
-
-    if (user.failedLoginAttempts >= 4) {
-      // Bloquear la cuenta por 3 minutos después de 4 intentos fallidos
-      user.accountLockedUntil = new Date().getTime() + 3 * 60 * 1000; // 3 Minutos
+    console.log('user account failes atempt count: ', user.failedLoginAttempts);
+    if (user.failedLoginAttempts >= 3) {
+      user.accountLockedUntil = new Date(
+        Math.floor(new Date().getTime() / 1000) * 1000 + 3 * 60 * 1000,
+      );
     }
 
     await this.userRepository.save(user);

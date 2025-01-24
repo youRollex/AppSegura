@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -56,7 +56,8 @@ export class AuthService {
       );
       return response.data;
     } catch (error) {
-      this.handleHttpExceptions(error);
+      console.log("error: ", error.response.data.message)
+      throw new HttpException(error.response.data.message, error.response.data.statusCode);
     }
   }
 
@@ -97,8 +98,8 @@ export class AuthService {
   }
 
   private handleHttpExceptions(error: any) {
-    console.error('Error en la solicitud HTTP:', error);
-    throw new Error('Error en la solicitud HTTP');
+    console.error('Error en la solicitud HTTP:', error.message);
+    throw new Error('Error en la solicitud HTTP ' + error);
   }
 
   private async validateCaptcha(token: string): Promise<boolean> {

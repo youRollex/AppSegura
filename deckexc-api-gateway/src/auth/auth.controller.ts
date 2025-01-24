@@ -1,4 +1,4 @@
-import { Post, Body, Param, Delete, Patch } from '@nestjs/common';
+import { Post, Body, Param, Delete, Patch, UnauthorizedException } from '@nestjs/common';
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -23,8 +23,15 @@ export class AuthController {
   }
 
   @Post('login')
-  loginUser(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.login(loginUserDto);
+  async loginUser(@Body() loginUserDto: LoginUserDto) {
+    try {
+      return await this.authService.login(loginUserDto);
+    } catch (error) {
+      if (error.message.includes('La cuenta está bloqueada')) {
+        throw new UnauthorizedException(error.message);
+      }
+      throw new UnauthorizedException('Credenciales incorrectas.');
+    }
   }
 
   @Post('reset')

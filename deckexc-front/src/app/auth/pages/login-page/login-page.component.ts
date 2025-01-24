@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ValidatorsService, containsNumberValidator, containsUpperCaseValidator } from '../../../shared/services/validators.service';
+import {
+  ValidatorsService,
+  containsNumberValidator,
+  containsUpperCaseValidator,
+} from '../../../shared/services/validators.service';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { RecaptchaModule } from 'ng-recaptcha';
@@ -11,24 +15,34 @@ import { environments } from 'src/app/environments/environments';
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css'],
 })
-export class LoginPageComponent implements OnInit{
-
+export class LoginPageComponent implements OnInit {
   public errorMessage: string = '';
-  public siteKey = environments.recaptcha.siteKey; 
+  public siteKey = environments.recaptcha.siteKey;
   public captchaResolved: boolean = false;
-  private captchaToken:string|null = null;
-  
+  private captchaToken: string | null = null;
+
   public loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.pattern(this.validatorSrv.emailPattern)]],
-    password: ['', [Validators.required, containsNumberValidator(), containsUpperCaseValidator(), Validators.minLength(6) ]]
-  })
+    email: [
+      '',
+      [Validators.required, Validators.pattern(this.validatorSrv.emailPattern)],
+    ],
+    password: [
+      '',
+      [
+        Validators.required,
+        containsNumberValidator(),
+        containsUpperCaseValidator(),
+        Validators.minLength(6),
+      ],
+    ],
+  });
 
   constructor(
     private fb: FormBuilder,
     private validatorSrv: ValidatorsService,
     private authService: AuthService,
     private router: Router
-  ){}
+  ) {}
 
   ngOnInit(): void {
     if (typeof localStorage !== 'undefined') {
@@ -36,9 +50,9 @@ export class LoginPageComponent implements OnInit{
       if (token !== null) {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
-      }}
+      }
+    }
   }
-
 
   isValidField(field: string): string | null {
     const control = this.loginForm.get(field);
@@ -56,39 +70,47 @@ export class LoginPageComponent implements OnInit{
     return null;
   }
 
-  onCaptchaResolved(token: string|null) {
+  onCaptchaResolved(token: string | null) {
     this.captchaToken = token;
-    console.log('captcha token: ', this.captchaToken)
     this.captchaResolved = true;
   }
 
-  onSubmit(){
+  onSubmit() {
     this.loginForm.markAllAsTouched();
 
     if (this.loginForm.invalid) {
       this.errorMessage = 'Por favor, completa todos los campos correctamente.';
       return;
     }
-    this.authService.login(this.loginForm.controls['email'].value, this.loginForm.controls['password'].value , this.captchaToken)
+    this.authService
+      .login(
+        this.loginForm.controls['email'].value,
+        this.loginForm.controls['password'].value,
+        this.captchaToken
+      )
       .subscribe(
         (data) => {
-          this.router.navigate(['/cards'])
+          this.router.navigate(['/cards']);
           this.errorMessage = '';
         },
-      (error) => {
-        if (error.status === 401) {
-          if (error.error.message && error.error.message.includes('Account is locked')) {
-            // Mensaje de cuenta bloqueada
-            this.errorMessage = 'Tu cuenta está bloqueada. Por favor, contacta al soporte.';
+        (error) => {
+          if (error.status === 401) {
+            if (
+              error.error.message &&
+              error.error.message.includes('La cuenta está bloqueada')
+            ) {
+              this.errorMessage = error.error.message;
+            } else {
+              this.errorMessage = 'Correo o contraseña incorrectos.';
+            }
           } else {
-            this.errorMessage = 'Correo o contraseña incorrectos.';
+            this.errorMessage = 'Error inesperado. Intenta más tarde.';
           }
-        } else {
-          this.errorMessage = 'Error inesperado. Intenta más tarde.';
+          
+          this.loginForm.reset();
+          this.captchaToken = null;
+          this.captchaResolved = false;
         }
-        }
-      )
+      );
   }
-
 }
-

@@ -45,7 +45,7 @@ export class User {
   failedLoginAttempts: number;    // Numero de intentos fallidos al login
 
   @Column({ type: 'timestamp', nullable: true })
-  accountLockedUntil: number;  // Tiempo en milisegundos hasta la cual la cuenta estara bloqueada
+  accountLockedUntil: Date;  // Tiempo en milisegundos hasta la cual la cuenta estara bloqueada
 
   @BeforeInsert()
   checkFieldBeforeInsert() {
