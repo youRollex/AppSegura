@@ -1,4 +1,4 @@
-import { Post, Body, Param, Delete, Patch, UnauthorizedException, Req } from '@nestjs/common';
+import { Post, Body, Param, Delete, Patch, UnauthorizedException, Req, UseInterceptors } from '@nestjs/common';
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -7,6 +7,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
 import { Auth, GetUser } from './decorators';
+import { LoggingInterceptor } from 'src/common/log-interceptor.service';
 
 @Controller('auth')
 export class AuthController {
