@@ -3,6 +3,9 @@ import { OffersInterface } from '../../../interfaces/oferta.interface';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CardsService } from '../../services/cards.service';
 import { TokenService } from '../../services/token.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
+import { catchError, filter, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-my-list',
@@ -18,7 +21,8 @@ export class MyListComponent implements OnInit {
   constructor(
     private cardSrv: CardsService,
     private fb: FormBuilder,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private dialog: MatDialog
   ) {
     this.paymentForm = this.fb.group({
       cardNumber: ['', [Validators.required, this.validateCardNumber]],
@@ -46,8 +50,7 @@ export class MyListComponent implements OnInit {
       (data) => {
         this.paymentDetails = data;
       },
-      (error) => {
-      }
+      () => {}
     );
   }
   ngOnInit(): void {
@@ -86,12 +89,45 @@ export class MyListComponent implements OnInit {
         (response) => {
           this.paymentDetails = response;
         },
-        (error) => {
-        }
+        (error) => {}
       );
     } else {
       console.error('Formulario inválido');
     }
+  }
+
+  onDeletePaymentDetail() {
+    if (!this.paymentDetails) {
+      return;
+    }
+
+    const userId = this.tokenService.getUserId();
+    if (!userId) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        data: this.paymentForm.value,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.cardSrv.deletePaymentDetail(userId).subscribe(
+          (success) => {
+            if (success) {
+              this.paymentDetails = null;
+              this.paymentForm.reset();
+            } else {
+              throw new Error("Ha ocurrido un error al eliminar el método de pago.");
+            }
+          },
+          (error) => {
+          }
+        );
+      }
+    });
   }
 
   private validateCardNumber(control: any): { [key: string]: boolean } | null {
@@ -157,8 +193,7 @@ export class MyListComponent implements OnInit {
           this.paymentDetails = response;
           this.isEditing = false;
         },
-        (error) => {
-        }
+        (error) => {}
       );
     }
   }

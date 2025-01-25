@@ -10,6 +10,7 @@ import { error } from 'console';
   providedIn: 'root',
 })
 export class CardsService {
+
   private baseUrl: string = environments.deckBack;
 
   constructor(private http: HttpClient) {}
@@ -128,6 +129,24 @@ export class CardsService {
     return this.http.patch(`${this.baseUrl}/auth/payment`, updatedPaymentData, {
       headers,
     });
+  }
+
+  deletePaymentDetail(userId: string): Observable<Boolean> {
+    const token = localStorage?.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    
+    const response = this.http
+    .delete<string>(`${this.baseUrl}/auth/payment/${userId}`, { headers })
+    .pipe(
+      catchError((err) => of(false))
+    );
+
+    return response.pipe(
+      map(() => true),
+      catchError(() => of(false))
+    );
   }
 
   logout() {

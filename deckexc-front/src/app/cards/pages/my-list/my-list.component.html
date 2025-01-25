@@ -10,10 +10,10 @@
   </div>
 </div>
 
-<mat-divider></mat-divider>
+<mat-divider class="mt-5"></mat-divider>
 
 <div class="mb-7" *ngIf="paymentDetails; else addPaymentMethod">
-  <h2 class="mt-5">Método de Pago</h2>
+  <h1 class="mt-5"><strong>Método de Pago</strong></h1>
   <div *ngIf="!isEditing; else editPaymentMethod">
     <div class="payment-details">
       <p><strong>Número de Tarjeta:</strong> {{ paymentDetails.cardNumber }}</p>
@@ -23,8 +23,12 @@
       </p>
       <p><strong>CVC:</strong> {{ paymentDetails.cvc }}</p>
     </div>
-    <button mat-flat-button color="accent" (click)="enableEditing()">
+    <button mat-flat-button color="primary" (click)="enableEditing()">
       Editar Método de Pago
+    </button>
+
+    <button mat-raised-button color="warn" class="ml-5" (click)="onDeletePaymentDetail()" >
+      Eliminar
     </button>
   </div>
 </div>
@@ -117,7 +121,7 @@
 
 <ng-template #addPaymentMethod>
   <h2 class="mt-5">Agregar Método de Pago</h2>
-  <div class="payment-method-container">
+  <div class="payment-method-container" class="mb-7">
     <form [formGroup]="paymentForm" (ngSubmit)="onSubmitPaymentMethod()">
       <mat-form-field appearance="fill" class="full-width">
         <mat-label>Número de tarjeta</mat-label>
@@ -185,7 +189,7 @@
         </mat-form-field>
       </div>
 
-      <div class="action-buttons">
+      <div class="action-buttons" class="mt-5">
         <button
           mat-flat-button
           color="primary"
