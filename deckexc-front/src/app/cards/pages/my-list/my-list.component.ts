@@ -46,7 +46,7 @@ export class MyListComponent implements OnInit {
       return;
     }
 
-    this.cardSrv.getPaymentDetails(userId).subscribe(
+    this.cardSrv.getPaymentDetails().subscribe(
       (data) => {
         this.paymentDetails = data;
       },
@@ -114,7 +114,7 @@ export class MyListComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result) {
-        this.cardSrv.deletePaymentDetail(userId).subscribe(
+        this.cardSrv.deletePaymentDetail().subscribe(
           (success) => {
             if (success) {
               this.paymentDetails = null;

@@ -97,13 +97,13 @@ export class CardsService {
     );
   }
 
-  getPaymentDetails(userId: string): Observable<any> {
+  getPaymentDetails(): Observable<any> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
     return this.http
-      .get<any>(`${this.baseUrl}/auth/payment/${userId}`, { headers })
+      .get<any>(`${this.baseUrl}/auth/payment`, { headers })
       .pipe(
         catchError((err) => of(false))
       );
@@ -131,14 +131,14 @@ export class CardsService {
     });
   }
 
-  deletePaymentDetail(userId: string): Observable<Boolean> {
+  deletePaymentDetail(): Observable<Boolean> {
     const token = localStorage?.getItem('token');
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
     
     const response = this.http
-    .delete<string>(`${this.baseUrl}/auth/payment/${userId}`, { headers })
+    .delete<string>(`${this.baseUrl}/auth/payment`, { headers })
     .pipe(
       catchError((err) => of(false))
     );

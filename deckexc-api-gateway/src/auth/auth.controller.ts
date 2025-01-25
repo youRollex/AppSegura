@@ -1,4 +1,4 @@
-import { Post, Body, Param, Delete, Patch, UnauthorizedException } from '@nestjs/common';
+import { Post, Body, Param, Delete, Patch, UnauthorizedException, Req } from '@nestjs/common';
 import { Controller, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -6,7 +6,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
-import { Auth } from './decorators';
+import { Auth, GetUser } from './decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -50,15 +50,16 @@ export class AuthController {
     return this.authService.createPaymentDetail(createPaymentDetails);
   }
 
-  @Delete('payment/:userId')
-  deletePaymentDetail(@Param('userId') userInfo: string) {
-    return this.authService.deletePaymentDetail(userInfo);
+  @Delete('payment')
+  @Auth()
+  deletePaymentDetail(@GetUser() userId: string) {
+    return this.authService.deletePaymentDetail(userId);
   }
 
-  @Get('payment/:userId')
+  @Get('payment')
   @Auth()
-  getPaymentDetailsByUser(@Param('userId') userInfo: string) {
-    return this.authService.findPaymentDetailByUser(userInfo);
+  getPaymentDetailsByUser(@GetUser() userId: string) {
+    return this.authService.findPaymentDetailByUser(userId);
   }
 
   @Patch('payment')
