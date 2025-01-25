@@ -66,7 +66,7 @@ export class NewPageComponent implements OnInit {
 
   // Para cuando se envie el formulario
   onSubmit(): void {
-    // if (this.cardForm.invalid) return;
+    if (this.cardForm.invalid) return;
     const cardId = this.cardForm.controls['cardId'].value
     const description = this.cardForm.controls['description'].value || '';
     const condition = this.cardForm.controls['condition'].value

@@ -12,7 +12,7 @@
 
 <mat-divider></mat-divider>
 
-<div *ngIf="paymentDetails; else addPaymentMethod">
+<div class="mb-7" *ngIf="paymentDetails; else addPaymentMethod">
   <h2 class="mt-5">Método de Pago</h2>
   <div *ngIf="!isEditing; else editPaymentMethod">
     <div class="payment-details">

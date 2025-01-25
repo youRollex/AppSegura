@@ -56,7 +56,6 @@ export class AuthService {
       );
       return response.data;
     } catch (error) {
-      console.log("error: ", error.response.data.message)
       throw new HttpException(error.response.data.message, error.response.data.statusCode);
     }
   }
