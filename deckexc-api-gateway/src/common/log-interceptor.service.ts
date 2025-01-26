@@ -10,14 +10,35 @@ import { catchError, tap } from 'rxjs/operators';
 import * as winston from 'winston';
 import * as moment from 'moment-timezone';
 
+/**
+ * Interceptor para registrar las solicitudes y respuestas HTTP.
+ * Este interceptor registra información detallada sobre las solicitudes entrantes,
+ * las respuestas salientes y los errores que ocurren durante el procesamiento.
+ * @class LoggingInterceptor
+ * @implements {NestInterceptor}
+ */
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  private readonly logger = new Logger('API Gateway');
+  /**
+   * Logger de NestJS para registrar mensajes en la consola.
+   * @private
+   */
+  private readonly loggerNest = new Logger('API Gateway');
 
-  private readonly logger1: winston.Logger;
+  /**
+   * Logger de Winston para registrar mensajes en un archivo de logs.
+   * @private
+   * @type {winston.Logger}
+   */
+  private readonly loggerWinston: winston.Logger;
 
+  /**
+   * Constructor del interceptor.
+   * Configura el logger de Winston para escribir logs en un archivo.
+   * @constructor
+   */
   constructor() {
-    this.logger1 = winston.createLogger({
+    this.loggerWinston = winston.createLogger({
       level: 'info',
       format: winston.format.combine(
         winston.format.timestamp({
@@ -42,6 +63,13 @@ export class LoggingInterceptor implements NestInterceptor {
     });
   }
 
+  /**
+   * Intercepta las solicitudes HTTP y registra información sobre ellas.
+   * @method intercept
+   * @param {ExecutionContext} context - El contexto de ejecución de la solicitud.
+   * @param {CallHandler} next - El manejador de la llamada.
+   * @returns {Observable<any>} Un observable que emite la respuesta.
+   */
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const req = context.switchToHttp().getRequest();
     const res = context.switchToHttp().getResponse();
@@ -49,11 +77,11 @@ export class LoggingInterceptor implements NestInterceptor {
     const userId = user || 'Unauthenticated';
 
     const startTime = Date.now();
-    this.logger.log(
+    this.loggerNest.log(
       `[Request] ${method} ${url} - User: ${userId} - IP: ${req.ip}`,
     );
 
-    this.logger1.info({
+    this.loggerWinston.info({
       message: `[Request] ${method} ${url}`,
       user: userId,
       ip: req.ip,
@@ -63,10 +91,10 @@ export class LoggingInterceptor implements NestInterceptor {
       tap(() => {
         const duration = Date.now() - startTime;
         const statusCode = res.statusCode;
-        this.logger.log(
+        this.loggerNest.log(
           `[Response] ${method} ${url} - User: ${userId} - Status: ${statusCode} - Duration: ${duration}ms`,
         );
-        this.logger1.info({
+        this.loggerWinston.info({
           message: `[Response] ${method} ${url}`,
           user: userId,
           status: statusCode,
@@ -76,11 +104,11 @@ export class LoggingInterceptor implements NestInterceptor {
       catchError((error) => {
         const duration = Date.now() - startTime;
         const statusCode = error.status || 500;
-        this.logger.error(
+        this.loggerNest.error(
           `[Error] ${method} ${url} - User: ${userId} - Status: ${statusCode} - Duration: ${duration}ms - Error: ${error.message}`,
         );
 
-        this.logger1.error({
+        this.loggerWinston.error({
           message: `[Error] ${method} ${url}`,
           user: userId,
           status: statusCode,
