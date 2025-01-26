@@ -19,13 +19,13 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: ['http://localhost:4200', 'https://deckexc-front-frd5gthjh4feddc0.eastus-01.azurewebsites.net'],
+    origin: ['http://localhost:4200',  process.env.FRONT_URL],
     methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`App running on port ${process.env.PORT}`);
+  console.log(`App running on port ${process.env.PORT}`,   process.env.FRONT_URL);
 }
 bootstrap();
