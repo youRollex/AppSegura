@@ -5,6 +5,10 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
+/**
+ * Entidad que representa un mensaje en el sistema.
+ * Contiene información sobre el contenido del mensaje, el usuario que lo envió y la fecha de creación.
+ */
 @Entity({ name: 'message' })
 export class Message {
   @PrimaryGeneratedColumn('uuid')
