@@ -8,6 +8,11 @@ import {
 } from 'typeorm';
 import { Question } from '../enum/question.enum';
 
+/**
+ * Entidad que representa a un usuario en el sistema.
+ * Contiene información básica sobre el usuario, sus credenciales, roles, y seguridad.
+*/
+
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn('uuid')

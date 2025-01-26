@@ -4,6 +4,11 @@ import {
     PrimaryGeneratedColumn,
   } from 'typeorm';
 
+/**
+ * Entidad que representa los detalles bancarios del usuario.
+ * Esta entidad se utiliza para almacenar información relacionada con la tarjeta bancaria.
+*/  
+
 @Entity('bank_details')
 export class BankDetails {
   @PrimaryGeneratedColumn('uuid')

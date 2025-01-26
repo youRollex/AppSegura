@@ -29,7 +29,7 @@ return (control: AbstractControl): { [key: string]: any } | null => {
 }
 
 export function nameValidator(): ValidatorFn {
-const nameRegex = /^[A-Za-záéíóúÁÉÍÓÚ\s]+$/;
+const nameRegex = /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/;
 return (control: AbstractControl): ValidationErrors | null => {
   if (control.value && !nameRegex.test(control.value)){
     return { invalidName: 'El nombre solo puede contener letras y espacios'};

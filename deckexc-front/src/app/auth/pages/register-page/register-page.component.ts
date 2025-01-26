@@ -19,7 +19,7 @@ export class RegisterPageComponent {
     name: ['', [Validators.required, nameValidator()]],
     password: ['', [Validators.required, containsNumberValidator(), containsUpperCaseValidator(), Validators.minLength(6), commonPasswordValidator()]],
     question: ['', [Validators.required]],
-    answer: ['', [Validators.required, Validators.minLength(4)]],
+    answer: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(20)]],
   })
 
   constructor(

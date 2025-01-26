@@ -42,11 +42,14 @@
     <mat-form-field>
       <mat-label>Respuesta</mat-label>
       <input type="text" matInput formControlName="answer" placeholder="Ingrese la respuesta a la pregunta">
-      <mat-hint *ngIf="isValidField('answer') && !registerForm.controls['answer'].hasError('minlength')" class="text-danger">
+      <mat-hint *ngIf="isValidField('answer') && !registerForm.controls['answer'].hasError('minlength') && !registerForm.controls['answer'].hasError('maxlength')" class="text-danger">
         Ingrese la respuesta
       </mat-hint>
-      <mat-hint *ngIf="registerForm.controls['answer'].hasError('minlength') && registerForm.controls['answer'].dirty" class="text-danger">
+      <mat-hint *ngIf="registerForm.controls['answer'].hasError('minlength')" class="text-danger">
         Respuesta muy corta. Debe tener al menos 3 caracteres.
+      </mat-hint>
+      <mat-hint *ngIf="registerForm.controls['answer'].hasError('maxlength')" class="text-danger">
+        Respuesta demasiado larga. No debe exceder los 20 caracteres.
       </mat-hint>
     </mat-form-field>
 
