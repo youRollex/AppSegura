@@ -2,23 +2,28 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Aplica un ValidationPipe global para validar y transformar los datos de entrada.
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
+      whitelist: true, // Elimina propiedades no definidas en los DTOs.
+      forbidNonWhitelisted: true, // Rechaza solicitudes con propiedades no permitidas.
+      transform: true, // Transforma automáticamente los datos a los tipos especificados en los DTOs.
       transformOptions: {
-        enableImplicitConversion: true,
+        enableImplicitConversion: true, // Habilita la conversión implícita de tipos.
       },
     }),
   );
 
   app.enableCors({
-    origin: '*',
+    origin: ['http://localhost:4200', 'https://deckexc-front-frd5gthjh4feddc0.eastus-01.azurewebsites.net'],
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+    credentials: true,
   });
+
   const port = process.env.PORT || 3000;
   await app.listen(port);
   console.log(`App running on port ${process.env.PORT}`);
