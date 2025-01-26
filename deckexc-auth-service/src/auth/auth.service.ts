@@ -93,7 +93,6 @@ export class AuthService {
     await this.userRepository.save(user);
 
     return {
-      id: user.id,
       email: user.email,
       token: this.getJwtToken({ id: user.id }),
     };

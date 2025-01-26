@@ -21,7 +21,7 @@ import { HttpModule } from '@nestjs/axios';
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: {
-            expiresIn: '2h',
+            expiresIn: '1h',
           },
         };
       },
