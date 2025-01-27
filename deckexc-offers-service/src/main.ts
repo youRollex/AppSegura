@@ -4,6 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  /**
+   * Configuración de validaciones globales con ValidationPipe
+   * 
+   * - `whitelist: true` -> Filtra propiedades no permitidas automáticamente.
+   * - `forbidNonWhitelisted: true` -> Rechaza solicitudes con propiedades no permitidas.
+   * - `transform: true` -> Convierte los datos de entrada al tipo esperado.
+   * - `transformOptions.enableImplicitConversion: true` -> Habilita la conversión implícita de tipos.
+   */
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

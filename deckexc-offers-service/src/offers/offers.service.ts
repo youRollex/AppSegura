@@ -13,6 +13,10 @@ import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import axios from 'axios';
 
+/**
+ * Servicio para la gestión de ofertas.
+ * Proporciona métodos CRUD y de integración con servicios externos.
+ */
 @Injectable()
 export class OffersService {
   private readonly logger = new Logger('OffersService');
@@ -24,6 +28,12 @@ export class OffersService {
     private readonly offerRepository: Repository<Offer>,
   ) {}
 
+  /**
+   * Crea una nueva oferta.
+   * @param {CreateOfferDto} createOfferDto - Datos para crear una oferta.
+   * @param {string} userId - ID del usuario que crea la oferta.
+   * @returns {Promise<Offer>} La oferta creada.
+   */
   async create(createOfferDto: CreateOfferDto, userId: string) {
     try {
       const offer = this.offerRepository.create({
@@ -37,6 +47,10 @@ export class OffersService {
     }
   }
 
+  /**
+   * Obtiene todas las ofertas con detalles de usuario y tarjeta.
+   * @returns {Promise<any[]>} Lista de ofertas con datos adicionales.
+   */
   async findAll() {
     const offers = await this.offerRepository.find();
     const offersWithDetails = []
@@ -50,6 +64,12 @@ export class OffersService {
     return offersWithDetails;
   }
 
+  /**
+   * Busca una oferta por ID o término.
+   * @param {string} term - ID de la oferta o término de búsqueda.
+   * @returns {Promise<any>} La oferta encontrada con detalles de usuario y tarjeta.
+   * @throws {NotFoundException} Si la oferta no se encuentra.
+   */
   async findOne(term: string) {
     let offer: Offer;
     if (isUUID(term)) {
@@ -63,6 +83,11 @@ export class OffersService {
     return { ...offer, user, card };
   }
 
+  /**
+   * Obtiene las ofertas de un usuario específico.
+   * @param {string} userId - ID del usuario.
+   * @returns {Promise<any[]>} Lista de ofertas con detalles adicionales.
+   */
   async findOneByUser(userId: string) {
     const offers = await this.offerRepository.find({
       where: { userId },
@@ -77,6 +102,13 @@ export class OffersService {
     return offersWithDetails;
   }
 
+  /**
+   * Obtiene información de usuario desde el servicio externo de autenticación.
+   * @private
+   * @param {string} userId - ID del usuario.
+   * @returns {Promise<any>} Datos del usuario.
+   * @throws {InternalServerErrorException} Si ocurre un error al obtener los datos.
+   */
   private async getUserById(userId: string) {
     try {
       const { data } = await axios.get(
@@ -88,6 +120,13 @@ export class OffersService {
     }
   }
 
+  /**
+   * Obtiene información de una tarjeta desde el servicio externo de tarjetas.
+   * @private
+   * @param {string} cardId - ID de la tarjeta.
+   * @returns {Promise<any>} Datos de la tarjeta.
+   * @throws {InternalServerErrorException} Si ocurre un error al obtener los datos.
+   */
   private async getCardById(cardId: string) {
     try {
       console.log(`${this.CARDS_SERVICE_URL}/cards/${cardId}`);
@@ -99,6 +138,14 @@ export class OffersService {
       throw new InternalServerErrorException('Error fetching card');
     }
   }
+
+  /**
+   * Actualiza una oferta existente.
+   * @param {string} id - ID de la oferta a actualizar.
+   * @param {UpdateOfferDto} updateOfferDto - Datos para actualizar la oferta.
+   * @returns {Promise<Offer>} La oferta actualizada.
+   * @throws {NotFoundException} Si la oferta no existe.
+   */
   async update(id: string, updateOfferDto: UpdateOfferDto) {
     const offer = await this.offerRepository.preload({
       id,
@@ -115,11 +162,22 @@ export class OffersService {
     }
   }
 
+  /**
+   * Elimina una oferta por su ID.
+   * @param {string} id - ID de la oferta a eliminar.
+   * @returns {Promise<void>}
+   */
   async remove(id: string) {
     const offer = await this.findOne(id);
     await this.offerRepository.remove(offer);
   }
 
+  /**
+   * Maneja excepciones de la base de datos y registra el error.
+   * @private
+   * @param {any} error - Error capturado durante la operación.
+   * @throws {InternalServerErrorException} Siempre lanza una excepción de error interno.
+   */
   private handleDBExceptions(error: any) {
     this.logger.error(error);
     throw new InternalServerErrorException(
