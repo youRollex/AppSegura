@@ -75,9 +75,11 @@ export class AuthService {
   }
 
   /**
-   * Guarda el `jti` en la base de datos en la tabla `Token`.
+   * Guarda el identificador único del token (jti) en la base de datos.
    * @param userId ID del usuario.
    * @param jti Identificador único del token.
+   * @returns El token guardado en la base de datos.
+   * @throws Error Si ocurre un problema al guardar el jti.
    */
   private async saveJti(userId: string, jti: string) {
     //await this.token_revokeRepository.delete({});
@@ -90,10 +92,11 @@ export class AuthService {
    * Valida el token JWT verificando el `jti` en la tabla `Token`.
    * @param userId ID del usuario autenticado.
    * @param jti Identificador único del token.
+   * @returns `true` si el jti es válido, `false` si ha sido revocado.
    * @throws UnauthorizedException Si el `jti` no coincide.
    */
   async validateJti(userId: string, jti: string) {
-    //console.log('todos los token♥ ', await this.token_revokeRepository.find());
+    console.log('todos los token♥ ', await this.token_revokeRepository.find());
     const token = await this.token_revokeRepository.findOne({
       where: { userId, jti },
     });
@@ -105,6 +108,12 @@ export class AuthService {
     return token ? true : false;
   }
 
+  /**
+   * Realiza el logout de un usuario al eliminar el jti de la base de datos.
+   * @param userId El ID del usuario que está realizando el logout.
+   * @param jti El identificador único del token que se desea revocar.
+   * @throws Error Si ocurre un problema al eliminar el jti.
+   */
   async logout(userId: string, jti: string) {
     const token = await this.token_revokeRepository.findOne({
       where: { userId, jti },
@@ -338,6 +347,12 @@ export class AuthService {
     return encrypted;
   }
 
+  /**
+   * Desencripta datos previamente encriptados utilizando el algoritmo AES-256-CBC.
+   * @param encryptedData Los datos encriptados que se desean desencriptar.
+   * @returns La información desencriptada.
+   * @throws Error Si ocurre un problema al desencriptar los datos.
+   */
   private decryptData(encryptedData: string): string {
     const key = crypto
       .createHash('sha256')
@@ -357,10 +372,20 @@ export class AuthService {
     return decrypted;
   }
 
+  /**
+   * Enmascara el número de tarjeta de crédito, mostrando solo los últimos 4 dígitos.
+   * @param cardNumber El número de tarjeta que se desea enmascarar.
+   * @returns El número de tarjeta enmascarado.
+   */
   private maskCardNumber(cardNumber: string): string {
     return cardNumber.replace(/\d(?=\d{4})/g, '*');
   }
 
+  /**
+   * Enmascara la fecha de expiración de una tarjeta de crédito.
+   * @param expirationDate La fecha de expiración de la tarjeta en formato `MM/YY`.
+   * @returns La fecha de expiración enmascarada.
+   */
   private maskExpirationDate(expirationDate: string): string {
     const [year, month] = expirationDate.split('/');
     return `*${month.slice(1)}/**${year.slice(2)}`;

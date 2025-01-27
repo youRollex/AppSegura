@@ -72,6 +72,12 @@ export class AuthController {
     }
   }
 
+  /**
+   * Cierra la sesión de un usuario y revoca su token.
+   * @param {LogOutUserDto} logOutUserDto - Datos para cerrar la sesión (userId y jti).
+   * @returns Mensaje de confirmación.
+   * @decorator @Post('logout')
+   */
   @Post('logout')
   async logOutUser(@Body() logOutUserDto: LogOutUserDto) {
     return await this.authService.removeExpiredToken(

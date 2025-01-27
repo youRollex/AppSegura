@@ -121,9 +121,13 @@ export class AuthController {
     return this.authService.updatePaymentDetail(updatePaymentDetails);
   }
 
+  /**
+   * Ruta POST para verificar si un token ha sido revocado.
+   * @param tokenData Contiene el ID de usuario (userId) y el JTI del token.
+   * @returns Un objeto que indica si el token ha sido revocado.
+   */
   @Post('check')
   async checkTokenRevoked(@Body() tokenData: TokenDataDto) {
-    console.log(tokenData);
     const isRevoked = await this.authService.validateJti(
       tokenData.userId,
       tokenData.jti,
@@ -131,16 +135,11 @@ export class AuthController {
     return { isRevoked };
   }
 
-  /*
-  @Post('logout')
-  async logout() {
-    await this.authService.logout(
-      '6e2e459b-13f6-446c-a7c0-b56ab2064227',
-      '2139a94e-75cc-4f06-801e-b9fecff2f64b',
-    );
-    return { message: 'Logout successful' };
-  }*/
-
+  /**
+   * Ruta POST para eliminar un token (logout) de un usuario.
+   * @param tokenData Contiene el ID de usuario (userId) y el JTI del token.
+   * @returns Un mensaje indicando el resultado del logout.
+   */
   @Post('remove')
   async remove(@Body() tokenData: TokenDataDto) {
     return await this.authService.logout(tokenData.userId, tokenData.jti);

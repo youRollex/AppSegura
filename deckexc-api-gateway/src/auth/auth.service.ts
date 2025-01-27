@@ -135,6 +135,13 @@ export class AuthService {
     }
   }
 
+  /**
+   * Elimina un token expirado para un usuario.
+   * @param {string} id - ID del usuario.
+   * @param {string} jti - ID del token que se desea eliminar.
+   * @returns Respuesta del servicio de autenticación.
+   * @throws {Error} Si ocurre un error en la solicitud HTTP.
+   */
   async removeExpiredToken(id: string, jti: string) {
     try {
       const data = { userId: id, jti: jti };
@@ -147,6 +154,14 @@ export class AuthService {
       this.handleHttpExceptions(error);
     }
   }
+
+  /**
+   * Verifica si un token ha sido revocado.
+   * @param {string} id - ID del usuario.
+   * @param {string} jti - ID del token a verificar.
+   * @returns {Promise<boolean>} `true` si el token ha sido revocado, `false` si no.
+   * @throws {Error} Si ocurre un error en la solicitud HTTP.
+   */
   async isTokenRevoked(id: string, jti: string): Promise<Boolean> {
     try {
       const data = { userId: id, jti: jti };

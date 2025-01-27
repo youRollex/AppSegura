@@ -168,7 +168,6 @@ export class CardsService {
               localStorage.clear();  
             },
             (error) => {
-              console.error('Logout failed', error);
               localStorage.clear();  
             }
           );
