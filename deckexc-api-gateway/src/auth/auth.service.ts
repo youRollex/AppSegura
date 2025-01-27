@@ -135,6 +135,31 @@ export class AuthService {
     }
   }
 
+  async removeExpiredToken(id: string, jti: string) {
+    try {
+      const data = { userId: id, jti: jti };
+
+      const response = await lastValueFrom(
+        this.httpService.post(`${this.AUTH_SERVICE_URL}/auth/remove`, data),
+      );
+      return response.data;
+    } catch (error) {
+      this.handleHttpExceptions(error);
+    }
+  }
+  async isTokenRevoked(id: string, jti: string): Promise<Boolean> {
+    try {
+      const data = { userId: id, jti: jti };
+
+      const response = await lastValueFrom(
+        this.httpService.post(`${this.AUTH_SERVICE_URL}/auth/check`, data),
+      );
+      return response.data;
+    } catch (error) {
+      this.handleHttpExceptions(error);
+    }
+  }
+
   /**
    * Maneja excepciones relacionadas con solicitudes HTTP.
    * @private

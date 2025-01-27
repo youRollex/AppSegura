@@ -4,13 +4,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, map, of } from 'rxjs';
 import { CardInterface } from '../../interfaces/card.interface';
 import { OffersInterface } from '../../interfaces/oferta.interface';
-import { error } from 'console';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CardsService {
-
   private baseUrl: string = environments.deckBack;
 
   constructor(private http: HttpClient) {}
@@ -104,9 +102,7 @@ export class CardsService {
     });
     return this.http
       .get<any>(`${this.baseUrl}/auth/payment`, { headers })
-      .pipe(
-        catchError((err) => of(false))
-      );
+      .pipe(catchError((err) => of(false)));
   }
 
   savePaymentMethod(paymentData: any): Observable<any> {
@@ -136,12 +132,10 @@ export class CardsService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
-    
+
     const response = this.http
-    .delete<string>(`${this.baseUrl}/auth/payment`, { headers })
-    .pipe(
-      catchError((err) => of(false))
-    );
+      .delete<string>(`${this.baseUrl}/auth/payment`, { headers })
+      .pipe(catchError((err) => of(false)));
 
     return response.pipe(
       map(() => true),
@@ -150,7 +144,38 @@ export class CardsService {
   }
 
   logout() {
-    localStorage.clear();
+    const token = localStorage?.getItem('token');
+    if (token) {
+      const tokenParts = token.split('.');
+  
+      if (tokenParts.length === 3) {
+        const payload = JSON.parse(atob(tokenParts[1]));
+  
+        const { jti, id } = payload;
+  
+        const data = {
+          userId: id,  
+          jti: jti,
+        };
+        
+        const headers = new HttpHeaders({
+          Authorization: `Bearer ${token}`,
+        });
+  
+        this.http.post(`${this.baseUrl}/auth/logout`, data, { headers })
+          .subscribe(
+            (response) => {
+              localStorage.clear();  
+            },
+            (error) => {
+              console.error('Logout failed', error);
+              localStorage.clear();  
+            }
+          );
+      }
+    } else {
+      localStorage.clear();
+    }
   }
 
   private _isOpen = false;

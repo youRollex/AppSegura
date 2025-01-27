@@ -7,25 +7,26 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 import { userInfo } from 'os';
 import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
+import { TokenDataDto } from './dto/token-data.dto';
 
 /**
  * Controlador de autenticación y gestión de pagos.
  * Maneja las rutas relacionadas con el registro de usuarios, login, restablecimiento de contraseñas y detalles de pago.
-*/
+ */
 
 @Controller('auth')
 export class AuthController {
   /**
    * Constructor del controlador que inyecta el servicio de autenticación.
    * @param authService Servicio de autenticación que maneja la lógica de negocio
-  */
+   */
   constructor(private readonly authService: AuthService) {}
 
   @Get('users')
   /**
    * Ruta GET para obtener todos los usuarios.
    * @returns Lista de usuarios.
-  */
+   */
   findAllUser() {
     return this.authService.findAll(); // Llama al servicio para obtener todos los usuarios
   }
@@ -34,7 +35,7 @@ export class AuthController {
    * Ruta GET para obtener un usuario específico por su ID.
    * @param id El ID del usuario a buscar
    * @returns Los detalles del usuario encontrado.
-  */
+   */
   @Get('users/:id')
   findOneUser(@Param('id') id: string) {
     return this.authService.findOne(id);
@@ -44,7 +45,7 @@ export class AuthController {
    * Ruta POST para registrar un nuevo usuario.
    * @param createUserDto Datos del usuario a crear.
    * @returns El usuario creado.
-  */
+   */
   @Post('register')
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.authService.create(createUserDto);
@@ -54,7 +55,7 @@ export class AuthController {
    * Ruta POST para realizar el login de un usuario.
    * @param loginUserDto Datos de login del usuario (email y contraseña)
    * @returns El token JWT o una respuesta del login.
-  */
+   */
   @Post('login')
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
@@ -64,7 +65,7 @@ export class AuthController {
    * Ruta POST para restablecer la contraseña de un usuario.
    * @param resetPasswordDto Datos necesarios para restablecer la contraseña (email, respuesta a pregunta de seguridad y nueva contraseña)
    * @returns Un mensaje de éxito o error sobre el restablecimiento de la contraseña.
-  */
+   */
   @Post('reset')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
@@ -74,7 +75,7 @@ export class AuthController {
    * Ruta GET para obtener la pregunta de seguridad de un usuario según su email.
    * @param email El email del usuario
    * @returns La pregunta de seguridad asociada al usuario.
-  */
+   */
   @Get('question/:email')
   getQuestion(@Param('email') email: string) {
     return this.authService.getQuestion(email);
@@ -84,7 +85,7 @@ export class AuthController {
    * Ruta POST para crear los detalles de pago de un usuario.
    * @param createPaymentDetails Datos del pago (número de tarjeta, CVC, fecha de expiración)
    * @returns Los detalles de pago creados.
-  */
+   */
   @Post('payment')
   createPaymentDetails(@Body() createPaymentDetails: CreatePaymentDetailDto) {
     return this.authService.createPaymentDetail(createPaymentDetails);
@@ -94,7 +95,7 @@ export class AuthController {
    * Ruta DELETE para eliminar los detalles de pago de un usuario.
    * @param userId El ID del usuario cuya información de pago se eliminará
    * @returns Un mensaje de éxito o error.
-  */
+   */
   @Delete('payment/:userId')
   deletePaymentDetail(@Param('userId') userInfo: string) {
     return this.authService.deletePaymentDetail(userInfo);
@@ -104,7 +105,7 @@ export class AuthController {
    * Ruta GET para obtener los detalles de pago de un usuario específico.
    * @param userId El ID del usuario cuyos detalles de pago se solicitan
    * @returns Los detalles de pago del usuario.
-  */
+   */
   @Get('payment/:userId')
   getPaymentDetailsByUser(@Param('userId') userInfo: string) {
     return this.authService.findPaymentDetailByUser(userInfo);
@@ -114,9 +115,34 @@ export class AuthController {
    * Ruta PATCH para actualizar los detalles de pago de un usuario.
    * @param updatePaymentDetails Datos de actualización de los detalles de pago (pueden ser CVC, fecha de expiración, etc.)
    * @returns Los detalles de pago actualizados.
-  */
+   */
   @Patch('payment')
-  updatePaymentDetails(@Body() updatePaymentDetails: UpdatePaymentDetailDto){
+  updatePaymentDetails(@Body() updatePaymentDetails: UpdatePaymentDetailDto) {
     return this.authService.updatePaymentDetail(updatePaymentDetails);
+  }
+
+  @Post('check')
+  async checkTokenRevoked(@Body() tokenData: TokenDataDto) {
+    console.log(tokenData);
+    const isRevoked = await this.authService.validateJti(
+      tokenData.userId,
+      tokenData.jti,
+    );
+    return { isRevoked };
+  }
+
+  /*
+  @Post('logout')
+  async logout() {
+    await this.authService.logout(
+      '6e2e459b-13f6-446c-a7c0-b56ab2064227',
+      '2139a94e-75cc-4f06-801e-b9fecff2f64b',
+    );
+    return { message: 'Logout successful' };
+  }*/
+
+  @Post('remove')
+  async remove(@Body() tokenData: TokenDataDto) {
+    return await this.authService.logout(tokenData.userId, tokenData.jti);
   }
 }

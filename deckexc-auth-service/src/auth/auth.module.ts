@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { BankDetails } from './entities/user.bankDetails.entity';
+import { Token } from './entities/token.entity';
 
 @Module({
   controllers: [AuthController],
@@ -16,6 +17,7 @@ import { BankDetails } from './entities/user.bankDetails.entity';
     ConfigModule,
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([BankDetails]),
+    TypeOrmModule.forFeature([Token]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -16,7 +16,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
 import { Auth, GetUser } from './decorators';
-import { LoggingInterceptor } from 'src/common/log-interceptor.service';
+import { LogOutUserDto } from './dto/logOut-user.dto';
 
 /**
  * Controlador para manejar las operaciones de autenticación y gestión de usuarios.
@@ -70,6 +70,14 @@ export class AuthController {
       }
       throw new UnauthorizedException('Credenciales incorrectas.');
     }
+  }
+
+  @Post('logout')
+  async logOutUser(@Body() logOutUserDto: LogOutUserDto) {
+    return await this.authService.removeExpiredToken(
+      logOutUserDto.userId,
+      logOutUserDto.jti,
+    );
   }
 
   /**

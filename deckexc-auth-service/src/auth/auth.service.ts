@@ -18,6 +18,9 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 import { BankDetails } from './entities/user.bankDetails.entity';
 import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
+import { Token } from './entities/token.entity';
+import { v4 as uuidv4 } from 'uuid';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +29,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(BankDetails)
     private readonly bank_detailsRepository: Repository<BankDetails>,
+    @InjectRepository(Token)
+    private readonly token_revokeRepository: Repository<Token>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -34,7 +39,7 @@ export class AuthService {
    * @param createUserDto Datos necesarios para crear un nuevo usuario.
    * @returns Un objeto con los datos del usuario y un token JWT.
    * @throws BadRequestException Si ocurre un error al crear el usuario.
-  */
+   */
   async create(createUserDto: CreateUserDto) {
     try {
       const { password, answer, ...userData } = createUserDto;
@@ -51,20 +56,63 @@ export class AuthService {
       delete user.password;
       delete user.answer;
 
-      return { ...user, token: this.getJwtToken({ id: user.id }) };
+      return { message: 'User created' };
     } catch (error) {
       this.handlerDBErrors(error);
     }
   }
 
   /**
-   * Genera un token JWT para un usuario dado.
+   * Genera un token JWT con un `jti` único.
    * @param payload Datos del usuario que se incluirán en el payload del token.
    * @returns Un token JWT.
-  */
-  private getJwtToken(payload: JwtPayLoad) {
-    const token = this.jwtService.sign(payload);
+   */
+  private async getJwtToken(payload: JwtPayLoad) {
+    const jti = uuidv4();
+    await this.saveJti(payload.id, jti);
+    const token = this.jwtService.sign({ ...payload, jti: jti });
     return token;
+  }
+
+  /**
+   * Guarda el `jti` en la base de datos en la tabla `Token`.
+   * @param userId ID del usuario.
+   * @param jti Identificador único del token.
+   */
+  private async saveJti(userId: string, jti: string) {
+    //await this.token_revokeRepository.delete({});
+    const token = this.token_revokeRepository.create({ userId, jti });
+    const tokencreadodb = await this.token_revokeRepository.save(token);
+    return tokencreadodb;
+  }
+
+  /**
+   * Valida el token JWT verificando el `jti` en la tabla `Token`.
+   * @param userId ID del usuario autenticado.
+   * @param jti Identificador único del token.
+   * @throws UnauthorizedException Si el `jti` no coincide.
+   */
+  async validateJti(userId: string, jti: string) {
+    //console.log('todos los token♥ ', await this.token_revokeRepository.find());
+    const token = await this.token_revokeRepository.findOne({
+      where: { userId, jti },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Token is invalid or has been revoked');
+    }
+
+    return token ? true : false;
+  }
+
+  async logout(userId: string, jti: string) {
+    const token = await this.token_revokeRepository.findOne({
+      where: { userId, jti },
+    });
+    if (!token) {
+      throw new Error('Token not found or already revoked');
+    }
+    await this.token_revokeRepository.remove(token);
   }
 
   /**
@@ -72,7 +120,7 @@ export class AuthService {
    * @param loginUserDto Contiene las credenciales del usuario.
    * @returns Un objeto con el email del usuario y su token JWT.
    * @throws UnauthorizedException Si las credenciales son incorrectas.
-  */
+   */
   async login(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
 
@@ -114,14 +162,14 @@ export class AuthService {
 
     return {
       email: user.email,
-      token: this.getJwtToken({ id: user.id }), // Generación de un nuevo token JWT
+      token: await this.getJwtToken({ id: user.id }),
     };
   }
 
   /**
    * Maneja los intentos fallidos de login, bloqueando la cuenta después de 3 intentos fallidos.
    * @param user El usuario que intenta iniciar sesión.
-  */
+   */
   private async handleFailedLogin(user: User) {
     user.failedLoginAttempts += 1;
     console.log('user account failes atempt count: ', user.failedLoginAttempts);
@@ -140,7 +188,7 @@ export class AuthService {
    * @returns Un mensaje de éxito.
    * @throws BadRequestException Si la respuesta de seguridad es incorrecta.
    * @throws NotFoundException Si el usuario no existe.
-  */
+   */
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { email, answer, password } = resetPasswordDto;
 
@@ -166,7 +214,7 @@ export class AuthService {
    * @param email El correo electrónico del usuario.
    * @returns La pregunta de seguridad.
    * @throws NotFoundException Si el usuario no existe.
-  */
+   */
   async getQuestion(email: string) {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
@@ -181,7 +229,7 @@ export class AuthService {
    * @param error El error que ocurrió al interactuar con la base de datos.
    * @throws BadRequestException Si el error es un error de restricción (como un correo duplicado).
    * @throws InternalServerErrorException Para otros errores generales.
-  */
+   */
   private handlerDBErrors(error: any): never {
     if (error.code === '23505') throw new BadRequestException(error.detail);
     console.log(error);
@@ -189,21 +237,9 @@ export class AuthService {
   }
 
   /**
-   * Verifica el estado de autenticación de un usuario.
-   * @param user El usuario autenticado.
-   * @returns Un objeto con los datos del usuario y un token JWT.
-  */
-  checkAuthStatus(user: User) {
-    return {
-      ...user,
-      token: this.getJwtToken({ id: user.id }),
-    };
-  }
-
-  /**
    * Devuelve todos los usuarios.
    * @returns Una lista de todos los usuarios registrados.
-  */
+   */
   async findAll() {
     const users = await this.userRepository.find();
     return users;
@@ -213,7 +249,7 @@ export class AuthService {
    * Devuelve un usuario específico por su ID.
    * @param id El ID del usuario.
    * @returns El usuario con el ID proporcionado.
-  */
+   */
   async findOne(id: string) {
     const user = await this.userRepository.findOneBy({ id });
     return user;
@@ -223,7 +259,7 @@ export class AuthService {
    * Devuelve un usuario específico por su correo electrónico.
    * @param email El correo electrónico del usuario.
    * @returns El usuario con el correo electrónico proporcionado.
-  */
+   */
   async findByEmail(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email } });
   }
@@ -233,7 +269,7 @@ export class AuthService {
    * @param createPaymentDetails Los detalles de pago a crear.
    * @returns Un objeto con los detalles de pago (enmascarados).
    * @throws Error Si no se encuentra al usuario o si ocurre un error en la creación.
-  */
+   */
   async createPaymentDetail(createPaymentDetails: CreatePaymentDetailDto) {
     try {
       const user = await this.userRepository.findOne({
@@ -282,7 +318,7 @@ export class AuthService {
    * Encripta los datos sensibles usando un algoritmo seguro.
    * @param data La información que se desea encriptar.
    * @returns La información encriptada.
-  */
+   */
   private encryptData(data: string): string {
     const key = crypto
       .createHash('sha256')
@@ -335,7 +371,7 @@ export class AuthService {
    * @param userInfo El identificador del usuario (generalmente, el ID del usuario).
    * @returns Un mensaje de éxito indicando que los detalles de pago fueron eliminados.
    * @throws NotFoundException Si no se encuentran los detalles de pago para el usuario.
-  */
+   */
   async deletePaymentDetail(userInfo: string) {
     const paymentDetail = await this.bank_detailsRepository.findOne({
       where: { userId: userInfo },
@@ -355,7 +391,7 @@ export class AuthService {
    * @param userInfo El identificador del usuario (generalmente, el ID del usuario).
    * @returns Un objeto con los detalles de pago, enmascarados.
    * @throws NotFoundException Si no se encuentran los detalles de pago para el usuario.
-  */
+   */
   async findPaymentDetailByUser(userInfo: string) {
     const paymentDetails = await this.bank_detailsRepository.findOne({
       where: { userId: userInfo },
@@ -381,7 +417,7 @@ export class AuthService {
    * @param updatePaymentDetailDto Los detalles de pago a actualizar.
    * @returns Un objeto con los detalles de pago actualizados.
    * @throws NotFoundException Si no se encuentra el usuario o los detalles de pago.
-  */
+   */
   async updatePaymentDetail(updatePaymentDetails: UpdatePaymentDetailDto) {
     try {
       const { userId, cardNumber, cvc, expirationDate } = updatePaymentDetails;
