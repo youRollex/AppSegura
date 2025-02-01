@@ -35,10 +35,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Valida el payload del token JWT.
    * Este método se ejecuta automáticamente después de que el token JWT es decodificado.
    * @param {JwtPayLoad} payload - El payload decodificado del token JWT.
-   * @returns {Promise<string>} El ID del usuario extraído del payload.
+   * @returns {Promise<any>} El ID del usuario extraído del payload.
    */
-  async validate(payload: JwtPayLoad): Promise<string> {
+  async validate(payload: JwtPayLoad): Promise<any> {
     const { id, jti, exp } = payload;
+    const data = await this.authService.findUserRoles(id);
 
     const currentTimestamp = Math.floor(Date.now() / 1000);
 
@@ -51,6 +52,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!isTokenRevoked) {
       throw new UnauthorizedException('Token has been revoked');
     }
-    return id;
+    const user = {
+      id: id,
+      roles: data.roles,
+    };
+    return user;
   }
 }

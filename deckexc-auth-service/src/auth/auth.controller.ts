@@ -22,15 +22,6 @@ export class AuthController {
    */
   constructor(private readonly authService: AuthService) {}
 
-  @Get('users')
-  /**
-   * Ruta GET para obtener todos los usuarios.
-   * @returns Lista de usuarios.
-   */
-  findAllUser() {
-    return this.authService.findAll(); // Llama al servicio para obtener todos los usuarios
-  }
-
   /**
    * Ruta GET para obtener un usuario específico por su ID.
    * @param id El ID del usuario a buscar

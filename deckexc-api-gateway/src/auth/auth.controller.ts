@@ -17,6 +17,7 @@ import { CreatePaymentDetailDto } from './dto/create-payment-detail.dto';
 import { UpdatePaymentDetailDto } from './dto/update-payment-detail.dto';
 import { Auth, GetUser } from './decorators';
 import { LogOutUserDto } from './dto/logOut-user.dto';
+import { ValidRoles } from './interfaces';
 
 /**
  * Controlador para manejar las operaciones de autenticación y gestión de usuarios.
@@ -31,16 +32,6 @@ export class AuthController {
    * @param {AuthService} authService - Servicio de autenticación.
    */
   constructor(private readonly authService: AuthService) {}
-
-  /**
-   * Obtiene todos los usuarios registrados.
-   * @returns Lista de usuarios.
-   * @decorator @Get('users')
-   */
-  @Get('users')
-  findAllUser() {
-    return this.authService.findAll();
-  }
 
   /**
    * Registra un nuevo usuario.
@@ -130,7 +121,7 @@ export class AuthController {
    */
   @Delete('payment')
   @Auth()
-  deletePaymentDetail(@GetUser() userId: string) {
+  deletePaymentDetail(@GetUser('id') userId: string) {
     return this.authService.deletePaymentDetail(userId);
   }
 
@@ -142,8 +133,8 @@ export class AuthController {
    * @decorator @Auth()
    */
   @Get('payment')
-  @Auth()
-  getPaymentDetailsByUser(@GetUser() userId: string) {
+  @Auth(ValidRoles.user)
+  getPaymentDetailsByUser(@GetUser('id') userId: string) {
     return this.authService.findPaymentDetailByUser(userId);
   }
 

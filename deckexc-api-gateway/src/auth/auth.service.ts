@@ -124,10 +124,10 @@ export class AuthService {
    * @returns Respuesta del servicio de autenticación.
    * @throws {Error} Si ocurre un error en la solicitud HTTP.
    */
-  async findAll() {
+  async findUserRoles(userId: string) {
     try {
       const response = await lastValueFrom(
-        this.httpService.get(`${this.AUTH_SERVICE_URL}/auth/users`),
+        this.httpService.get(`${this.AUTH_SERVICE_URL}/auth/users/${userId}`),
       );
       return response.data;
     } catch (error) {

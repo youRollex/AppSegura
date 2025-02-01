@@ -246,21 +246,15 @@ export class AuthService {
   }
 
   /**
-   * Devuelve todos los usuarios.
-   * @returns Una lista de todos los usuarios registrados.
-   */
-  async findAll() {
-    const users = await this.userRepository.find();
-    return users;
-  }
-
-  /**
    * Devuelve un usuario específico por su ID.
    * @param id El ID del usuario.
    * @returns El usuario con el ID proporcionado.
    */
   async findOne(id: string) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id','name','roles'],
+    });
     return user;
   }
 

@@ -38,7 +38,7 @@ export class OffersController {
   @Auth()
   createOffer(
     @Body() createOfferDto: CreateOfferDto,
-    @GetUser() userId: string,
+    @GetUser('id') userId: string,
   ) {
     return this.offersService.create(createOfferDto, userId);
   }
@@ -62,7 +62,7 @@ export class OffersController {
    */
   @Get('user')
   @Auth()
-  findOneOfferByUser(@GetUser() userId: string) {
+  findOneOfferByUser(@GetUser('id') userId: string) {
     return this.offersService.findOneByUser(userId);
   }
 
