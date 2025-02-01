@@ -1,4 +1,6 @@
-import { IsUUID, IsString, IsDateString, Length, IsNotEmpty } from 'class-validator';
+import { IsUUID, IsString, IsDateString, Length, IsNotEmpty, Validate, Matches } from 'class-validator';
+import { IsLuhnValid } from '../validators/luhn.validator';
+import { IsValidExpirationDate } from '../validators/expiration-date.validator';
 
 /**
   * DTO para la creación de un nuevo detalle de pago
@@ -28,6 +30,7 @@ export class CreatePaymentDetailDto {
   @IsString()
   @Length(16, 16, { message: 'Card number must be exactly 16 characters long' })
   @IsNotEmpty()
+  @Validate(IsLuhnValid, { message: 'The card number is invalid' })
   cardNumber: string;
 
   /**
@@ -41,16 +44,18 @@ export class CreatePaymentDetailDto {
 
   @IsString()
   @Length(3, 4, { message: 'CVC must be 3 or 4 characters long' })
+  @Matches(/^[1-9][0-9]{2,3}$/, { message: 'CVC must contain only numbers and cannot start with 0' })
   @IsNotEmpty()
   cvc: string;
 
   /**
    * Fecha de expiración de la tarjeta de crédito.
    * @type {string}
-   * @format MM/YY
+   * @format YYYY/MM
    * @isNotEmpty Este campo no puede estar vacío.
   */
   @IsString()
   @IsNotEmpty()
+  @Validate(IsValidExpirationDate, { message: 'The expiration date is invalid or expired' })
   expirationDate: string;
 }

@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  Min,
   MinLength,
 } from 'class-validator';
 import { OfferCondition } from '../enum/offer-condition.enum';
@@ -44,7 +45,8 @@ export class CreateOfferDto {
    * Precio de la oferta en valor numérico.
    * - Debe ser un número válido.
    * @example 150.00
-   */
+   */ 
   @IsNumber()
+  @Min(0.01, { message: 'El precio debe ser mayor que 0.' })
   price: number;
 }

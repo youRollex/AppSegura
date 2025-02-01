@@ -129,7 +129,7 @@ export class OffersService {
    */
   private async getCardById(cardId: string) {
     try {
-      console.log(`${this.CARDS_SERVICE_URL}/cards/${cardId}`);
+      //console.log(`${this.CARDS_SERVICE_URL}/cards/${cardId}`);
       const { data } = await axios.get(
         `${this.CARDS_SERVICE_URL}/cards/${cardId}`,
       );

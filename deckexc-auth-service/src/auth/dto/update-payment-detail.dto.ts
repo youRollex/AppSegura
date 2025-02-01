@@ -3,7 +3,11 @@ import {
   IsString,
   Length,
   IsNotEmpty,
+  Validate,
+  Matches,
 } from 'class-validator';
+import { IsLuhnValid } from '../validators/luhn.validator';
+import { IsValidExpirationDate } from '../validators/expiration-date.validator';
 
 /**
  * DTO para la actualización de los detalles de pago.
@@ -31,6 +35,7 @@ export class UpdatePaymentDetailDto {
   */
   @IsString()
   @Length(16, 16, { message: 'Card number must be exactly 16 characters long' })
+  @Validate(IsLuhnValid, { message: 'The card number is invalid' })
   cardNumber?: string | null;
 
   /**
@@ -42,6 +47,7 @@ export class UpdatePaymentDetailDto {
   */
   @IsString()
   @Length(3, 4, { message: 'CVC must be 3 or 4 characters long' })
+  @Matches(/^[1-9][0-9]{2,3}$/, { message: 'CVC must contain only numbers and cannot start with 0' })
   cvc?: string | null;
 
   /**
@@ -50,5 +56,6 @@ export class UpdatePaymentDetailDto {
    * @type {string | null}
   */
   @IsString()
+  @Validate(IsValidExpirationDate, { message: 'The expiration date is invalid or expired' })
   expirationDate?: string | null;
 }

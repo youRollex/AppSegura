@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Check, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { OfferCondition } from '../enum/offer-condition.enum';
 
 /**
@@ -16,8 +16,8 @@ export class Offer {
   @Column('text', { nullable: false })
   cardId: string;  // Asegurar que no sea nulo
   
-  @Column('text', { length: 500 })
-  description: string;  // Limitar la longitud de la descripción para evitar ataques de almacenamiento
+  @Column('varchar', { length: 500, nullable: false })
+  description: string;
   
   @Column({
     type: 'enum',
@@ -26,10 +26,12 @@ export class Offer {
   condition: OfferCondition;
 
   @Column({
-    type: 'float',
-    default: 0,
+    type: 'numeric',
     precision: 10,
     scale: 2,
+    default: 0,
+    nullable: false,
   })
+  @Check(`"price" > 0`)  // Asegura que el valor sea mayor a 0
   price: number;  // Definir precisión para evitar errores de redondeo en cálculos monetarios
 }
