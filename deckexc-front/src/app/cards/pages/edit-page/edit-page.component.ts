@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CardsService } from '../../services/cards.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -19,7 +19,7 @@ export class EditPageComponent implements OnInit {
   public offer!: OffersInterface
   public cardForm = new FormGroup({
     condition: new FormControl<string>(''),
-    price: new FormControl<number>(0, { nonNullable: true }),
+    price: new FormControl<number>(1, [Validators.required, Validators.min(1), Validators.max(1000000)])
   });
 
 

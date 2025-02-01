@@ -52,6 +52,9 @@
             <mat-error *ngIf="cardForm.controls['price'].hasError('min')">
               No se pueden ingresar valores negativos.
             </mat-error>
+            <mat-error *ngIf="cardForm.controls['price'].hasError('max')">
+              Límite de precio execido.
+            </mat-error>
             <mat-error *ngIf="cardForm.controls['price'].hasError('required')">
               El precio es obligatorio.
             </mat-error>

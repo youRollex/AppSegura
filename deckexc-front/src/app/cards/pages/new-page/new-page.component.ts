@@ -20,7 +20,7 @@ export class NewPageComponent implements OnInit {
     cardId: new FormControl<string>('', { nonNullable: true }),
     description: new FormControl<string>('', [Validators.required, Validators.maxLength(150), descriptionValidator()]),
     condition: new FormControl<string>('', { nonNullable: true }),
-    price: new FormControl<number>(0, [Validators.required, Validators.min(0)]),
+    price: new FormControl<number>(1, [Validators.required, Validators.min(1), Validators.max(1000000)]),
   });
 
 
